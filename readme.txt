@@ -1,4 +1,4 @@
-﻿=== WP.SMSn1.Ru – Ultimate SMS & MMS Notifications, 2FA, OTP, and Integrations with WooCommerce, GravityForms, and More ===
+﻿=== WP.SMSn1.ru – Integration of SMS notifications, verification, registration and authorization by phone number using a one-time code from SMS. SMS notifications, including for WooCommerce. So far, only for mobile operators in the Russian Federation. ===
 Contributors: Vasilev Mikhail Y.
 Plugin link: https://wp.smsn1.ru
 Support: https://wp.smsn1.ru/контакты-службы-поддержки/
