@@ -31,13 +31,21 @@ function Invoke-Gh {
 }
 
 Write-Host '== Проверка авторизации ==' -ForegroundColor Cyan
-& $gh auth status
-if ($LASTEXITCODE -ne 0) {
-    throw 'Нет авторизации. Выполните: gh auth login --hostname github.com --git-protocol https --web'
-}
+if ($env:GH_TOKEN) {
+    Write-Host 'Используется токен из переменной GH_TOKEN.' -ForegroundColor Yellow
+} else {
+    & $gh auth status
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Нет авторизации. Выполните: gh auth login --hostname github.com --git-protocol https --web'
+    }
 
-Write-Host '== Настройка git credential helper на gh ==' -ForegroundColor Cyan
-Invoke-Gh @('auth', 'setup-git', '--hostname', 'github.com')
+    Write-Host '== Настройка git credential helper на gh ==' -ForegroundColor Cyan
+    try {
+        Invoke-Gh @('auth', 'setup-git', '--hostname', 'github.com')
+    } catch {
+        Write-Warning "Не удалось настроить credential helper ($_). Git push придётся выполнять с токеном."
+    }
+}
 
 Write-Host '== Описание, ссылка, topics ==' -ForegroundColor Cyan
 Invoke-Gh @(
