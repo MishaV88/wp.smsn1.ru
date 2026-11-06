@@ -20,3 +20,6 @@ desktop.ini
 /node_modules/
 composer.lock
 package-lock.json
+
+# Локальные инструменты разработки
+.tools/

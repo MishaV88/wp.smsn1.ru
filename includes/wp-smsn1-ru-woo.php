@@ -46,24 +46,36 @@ function wp_smsn1_ru_hide_default_phone_fields() {
 // Валидация SMS-кода перед завершением заказа
 add_action('woocommerce_checkout_process', 'wp_smsn1_ru_validate_checkout_sms_code');
 function wp_smsn1_ru_validate_checkout_sms_code() {
-    $phone_number = isset($_POST['custom_phone']) ? sanitize_my_phone_for_field($_POST['custom_phone']) : '';
-
-    if (empty($_POST['sms_code'])) {
-        wc_add_notice(__('Пожалуйста, введите код подтверждения.'), 'error');
-    } else {
-        $user_code = sanitize_text_field($_POST['sms_code']);
-        $saved_code = get_transient('wp_smsn1_ru_code_' . $phone_number);
-
-        if ($saved_code === false || !hash_equals((string)$saved_code, (string)$user_code)) {
-            wc_add_notice(__('Неверный код подтверждения.'), 'error');
-        }
+    // Проверка нужна только гостям и только при включённой опции:
+    // иначе авторизованный покупатель не может оформить заказ (поля кода в его форме нет).
+    if (get_option('wp_smsn1_ru_verphone_on_checkout_mode') !== 'yes' || is_user_logged_in()) {
+        return;
     }
 
-    if (!empty($phone_number)) {
-        $user_id = wp_smsn1_ru_get_user_by_phone($phone_number);
-        if ($user_id) {
-            wc_add_notice(__('Пользователь с таким номером телефона уже существует. <a href="'.esc_url(home_url('/') . get_option('wp_smsn1_ru_use_custom_login_form_url')).'">Войдите в систему</a>.'), 'error');
-        }
+    $phone_number = isset($_POST['custom_phone']) ? sanitize_my_phone_for_field(wp_unslash($_POST['custom_phone'])) : '';
+    $user_code    = isset($_POST['sms_code']) ? sanitize_text_field(wp_unslash($_POST['sms_code'])) : '';
+
+    if ($phone_number === '' || $phone_number === 'not_russian_num') {
+        wc_add_notice(__('Укажите корректный номер телефона.'), 'error');
+        return;
+    }
+
+    if ($user_code === '') {
+        wc_add_notice(__('Пожалуйста, введите код подтверждения.'), 'error');
+        return;
+    }
+
+    // consume = false: код остаётся действительным, если заказ не удалось оформить
+    // с первой попытки (ошибка оплаты, повторная валидация).
+    $checked = wp_smsn1_ru_otp_check($phone_number, $user_code, false);
+
+    if ($checked !== true) {
+        wc_add_notice($checked, 'error');
+        return;
+    }
+
+    if (wp_smsn1_ru_get_user_by_phone($phone_number)) {
+        wc_add_notice(__('Пользователь с таким номером телефона уже существует. <a href="' . esc_url(home_url('/') . get_option('wp_smsn1_ru_use_custom_login_form_url')) . '">Войдите в систему</a>.'), 'error');
     }
 }
 
@@ -104,7 +116,7 @@ function wp_smsn1_ru_phone_verification_shortcode() {
         </p>
         <p class="form-row form-row-wide" >
             <label  for="sms_code"><?php _e('Код подтверждения'); ?> <span class="required">*</span></label>
-            <input type="text" class="input-text" name="sms_code" id="sms_code" placeholder="<?php __('Введите код из СМС'); ?>" />
+            <input type="text" class="input-text" name="sms_code" id="sms_code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="<?php esc_attr_e('Введите код из СМС'); ?>" />
         </p>
         <button type="button" id="send-sms-code-checkout" class="button"><?php _e('Отправить код'); ?></button>
     </div>
