@@ -52,6 +52,9 @@ jobs:
       - name: Check Version / Stable tag / CHANGELOG (informational)
         run: php bin/check-version.php || echo "::warning::Версия в заголовке плагина, Stable tag и CHANGELOG расходятся — см. вывод выше."
 
+      - name: Run OTP logic tests
+        run: php tests/otp-test.php
+
       - name: Build dist/wp-smsn1-ru.zip
         run: bash bin/build.sh
 

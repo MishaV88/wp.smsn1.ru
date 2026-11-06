@@ -5,7 +5,7 @@
  * Plugin URI:  https://wp.smsn1.ru/
  * Author URI:  https://docs-group.ru/
  * Support URI: https://wp.smsn1.ru/контакты-службы-поддержки/
- * Version: 1.0
+ * Version: 1.1.0
  * Author: Vasilev Mikhail Y.
  * License:     GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -15,8 +15,13 @@ if (!defined('ABSPATH')) {
     exit; // Запрет прямого доступа к файлу
 }
 
+if (!defined('WP_SMSN1_RU_VERSION')) {
+    define('WP_SMSN1_RU_VERSION', '1.1.0');
+}
+
 // Подключение необходимых файлов
 require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-functions.php'; //Функции необходимые для работы с wp.smsn1.ru(если быть точнее direct.docs-group.ru)
+require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-otp.php'; // OTP: генерация, лимит попыток, защита от SMS-бомбинга
 require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-admin.php'; //Этот файл будет содержать код для добавления настроек плагина в административной панели.
 // Проверка работоспособности плагина и активирован ли WooCommerce
 if (  wp_smsn1_ru_get_balance() >= 10 && wp_smsn1_ru_get_balance() != "Проблема с соединением" && in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) )) {
@@ -125,8 +130,8 @@ function wp_smsn1_ru_locate_template($template_name) {
 }
 // Подключение скриптов и стилей
 function wp_smsn1_ru_scripts() {
-    wp_enqueue_style('wp-smsn1-ru-style', plugins_url('/assets/css/style.css', __FILE__));
-    wp_enqueue_script('wp-smsn1-ru-script', plugins_url('/assets/js/script.js', __FILE__), array('jquery'), null, true);
+    wp_enqueue_style('wp-smsn1-ru-style', plugins_url('/assets/css/style.css', __FILE__), array(), WP_SMSN1_RU_VERSION);
+    wp_enqueue_script('wp-smsn1-ru-script', plugins_url('/assets/js/script.js', __FILE__), array('jquery'), WP_SMSN1_RU_VERSION, true);
     
     // Локализация скрипта для AJAX
     wp_localize_script('wp-smsn1-ru-script', 'wp_smsn1_ru_ajax', array(
@@ -182,79 +187,109 @@ function sanitize_my_phone_for_field($phone_number) {
 // Обработка отправки СМС кода
 function handle_send_sms_code() {
     check_ajax_referer('wp_smsn1_ru_nonce', 'nonce');
-    $phone_number = sanitize_my_phone_for_field($_POST['phone_number']);
 
-	if($phone_number == "not_russian_num")
-		wp_send_json_error('Проверьте номер телефона, на текущий момент доставка СМС осуществляется только на номера Российской Федерации');
-    // Генерация кода
-    $sms_code = wp_rand(1000, 9999);
-    $type_of_form = $_POST['type_of_form']; // Получение e-mail
-	if($type_of_form == "login") {
-		$user_id = wp_smsn1_ru_get_user_by_phone($phone_number);
-		if(!$user_id) {
-			$register_url = home_url('/') . get_option('wp_smsn1_ru_use_custom_register_form_url', 'registation-by-wp-smsn1-ru');
-			wp_send_json_error('Телефонный номер не найден, просьба <a href="' . esc_url($register_url) . '">зарегестрироваться(30 секунд)</a><style>.wp-smsn1-ru-form button[type="submit"]{background-color: #bbb;} .wp-smsn1-ru-form button[type="submit"] ~ button{    background-color: #0073aa; } </style>');
-		}
-	}		
-    // Сохранение кода в transient (временное хранилище)
-    set_transient('wp_smsn1_ru_code_' . $phone_number, $sms_code, 5 * MINUTE_IN_SECONDS);
-    
-    // Вызов вашей функции отправки СМС
-    $sms_sent = wp_smsn1_ru_send_code_function($phone_number, $sms_code);
-    if ($sms_sent === true) {
-        wp_send_json_success('Код отправлен на ваш номер: '.$phone_number );
-    } else {
-        wp_send_json_error('Ошибка при отправке СМС: #' . $sms_sent);
+    $phone_number = isset($_POST['phone_number']) ? sanitize_my_phone_for_field(wp_unslash($_POST['phone_number'])) : 'not_russian_num';
+
+    if ($phone_number === 'not_russian_num') {
+        wp_send_json_error('Проверьте номер телефона, на текущий момент доставка СМС осуществляется только на номера Российской Федерации');
     }
+
+    $type_of_form = isset($_POST['type_of_form']) ? sanitize_text_field(wp_unslash($_POST['type_of_form'])) : '';
+
+    if ($type_of_form === 'login' && !wp_smsn1_ru_get_user_by_phone($phone_number)) {
+        $register_url = home_url('/') . get_option('wp_smsn1_ru_use_custom_register_form_url', 'registation-by-wp-smsn1-ru');
+        wp_send_json_error('Телефонный номер не найден, просьба <a href="' . esc_url($register_url) . '">зарегестрироваться(30 секунд)</a><style>.wp-smsn1-ru-form button[type="submit"]{background-color: #bbb;} .wp-smsn1-ru-form button[type="submit"] ~ button{    background-color: #0073aa; } </style>');
+    }
+
+    // Защита от SMS-бомбинга: пауза между отправками и часовые лимиты на номер и IP
+    $can_send = wp_smsn1_ru_otp_can_send($phone_number);
+
+    if ($can_send !== true) {
+        wp_send_json_error($can_send);
+    }
+
+    $sms_code = wp_smsn1_ru_otp_generate();
+
+    // Сначала отправляем и только после успеха сохраняем код: если СМС не ушла,
+    // пользователь не должен ждать истечения кода, которого он не получил.
+    $sms_sent = wp_smsn1_ru_send_code_function($phone_number, $sms_code);
+
+    if ($sms_sent !== true) {
+        $message = is_numeric($sms_sent) ? '#' . $sms_sent : $sms_sent;
+        wp_send_json_error('Ошибка при отправке СМС: ' . $message);
+    }
+
+    wp_smsn1_ru_otp_store($phone_number, $sms_code);
+    wp_smsn1_ru_otp_mark_sent($phone_number);
+
+    wp_send_json_success('Код отправлен на ваш номер: ' . $phone_number);
 }
 
 // Обработка проверки кода
 function handle_verify_sms_code() {
     check_ajax_referer('wp_smsn1_ru_nonce', 'nonce');
 
-    $phone_number = sanitize_my_phone_for_field($_POST['phone_number']);
-    if ($phone_number == "not_russian_num") {
-        wp_send_json_error("Проверьте номер телефона, на текущий момент доставка СМС осуществляется только на номера Российской Федерации");
+    $phone_number = isset($_POST['phone_number']) ? sanitize_my_phone_for_field(wp_unslash($_POST['phone_number'])) : 'not_russian_num';
+
+    if ($phone_number === 'not_russian_num') {
+        wp_send_json_error('Проверьте номер телефона, на текущий момент доставка СМС осуществляется только на номера Российской Федерации');
     }
 
-    $user_code = sanitize_text_field($_POST['sms_code']);
-    $email = sanitize_email($_POST['reg_email']); // Получение e-mail
-    $type_of_form = sanitize_text_field($_POST['type_of_form']); // Тип формы
+    $user_code = isset($_POST['sms_code']) ? sanitize_text_field(wp_unslash($_POST['sms_code'])) : '';
+    $email     = isset($_POST['reg_email']) ? sanitize_email(wp_unslash($_POST['reg_email'])) : '';
 
-    // Получение сохраненного кода
-    $saved_code = get_transient('wp_smsn1_ru_code_' . $phone_number);
+    // Пользователь и e-mail проверяются до расхода кода: иначе ошибка в форме
+    // «съедала» бы верный код, и его пришлось бы запрашивать заново.
+    $user_id = wp_smsn1_ru_get_user_by_phone($phone_number);
 
-    if ($saved_code !== false && strlen($user_code) === 4 && hash_equals((string)$saved_code, (string)$user_code)) {
+    if (!$user_id) {
+        $email_required = get_option('wp_smsn1_ru_email_not_need_mode') !== 'yes';
 
-        // Регистрация или авторизация пользователя
-        $user_id = wp_smsn1_ru_get_user_by_phone($phone_number);
-
-        if (!$user_id) {
-            // Пользователя нет — регистрируем
-            if (email_exists($email)) {
-                wp_send_json_error('Этот e-mail уже зарегистрирован.');
-            }
-
-            $user_id = wp_smsn1_ru_create_user($phone_number, $email);
-
-            if (!$user_id) {
-                wp_send_json_error('Ошибка при создании пользователя.');
-            }
-
-            wp_set_auth_cookie($user_id, true);
-            delete_transient('wp_smsn1_ru_code_' . $phone_number);
-            wp_send_json_success('Успешная регистрация, Вы авторизованы.');
-
-        } else {
-            // Пользователь есть — авторизуем
-            wp_set_auth_cookie($user_id, true);
-            delete_transient('wp_smsn1_ru_code_' . $phone_number);
-            wp_send_json_success('Успешная авторизация.');
+        if ($email_required && !is_email($email)) {
+            wp_send_json_error('Укажите корректный e-mail: он потребуется для восстановления доступа.');
         }
 
-    } else {
-        wp_send_json_error('Неверный код.');
+        if ($email !== '' && email_exists($email)) {
+            wp_send_json_error('Этот e-mail уже зарегистрирован.');
+        }
     }
+
+    // Не более 5 неверных попыток, после чего код аннулируется
+    $checked = wp_smsn1_ru_otp_check($phone_number, $user_code);
+
+    if ($checked !== true) {
+        wp_send_json_error($checked);
+    }
+
+    $message = 'Успешная авторизация.';
+
+    if (!$user_id) {
+        $user_id = wp_smsn1_ru_create_user($phone_number, $email);
+
+        if (is_wp_error($user_id)) {
+            wp_send_json_error('Ошибка при создании пользователя: ' . $user_id->get_error_message());
+        }
+
+        if (!$user_id) {
+            wp_send_json_error('Ошибка при создании пользователя.');
+        }
+
+        $message = 'Успешная регистрация, Вы авторизованы.';
+    }
+
+    $user = get_user_by('id', $user_id);
+
+    if (!$user) {
+        wp_send_json_error('Не удалось загрузить учётную запись.');
+    }
+
+    wp_set_current_user($user_id);
+    wp_set_auth_cookie($user_id, true);
+
+    // Хук нужен плагинам 2FA, аудита входов и WooCommerce
+    do_action('wp_login', $user->user_login, $user);
+
+    wp_send_json_success($message);
 }
 
 // Поиск пользователя по номеру телефона
@@ -271,21 +306,26 @@ function wp_smsn1_ru_get_user_by_phone($phone_number) {
 
 // Создание нового пользователя
 function wp_smsn1_ru_create_user($phone_number, $email) {
-    $username = 'user_' . mb_substr( $phone_number, 2);
-    $password = wp_generate_password();
-    
-	    // Создание пользователя с e-mail
-    $user_id = wp_create_user($username, $password, $email);
-    
-    if (!is_wp_error($user_id)) {
-        // Сохранение номера телефона в user meta
-        //update_user_meta($user_id, 'phone_number', $phone_number); // Для внутреннего использования
-        update_user_meta($user_id, 'billing_phone', $phone_number); // Для WooCommerce или других плагинов
-        
+    $username = 'user_' . mb_substr($phone_number, 2);
+
+    // Логин должен быть уникальным: при совпадении добавляем случайный суффикс
+    if (username_exists($username)) {
+        $username .= '_' . wp_rand(1000, 9999);
+    }
+
+    $password = wp_generate_password(20, true, true);
+    $user_id  = wp_create_user($username, $password, $email);
+
+    if (is_wp_error($user_id)) {
         return $user_id;
     }
-    return false;
+
+    // Номер хранится в billing_phone — так его видят WooCommerce и другие плагины
+    update_user_meta($user_id, 'billing_phone', $phone_number);
+
+    return $user_id;
 }
+
 /* Удаление всех опций из БД после удаления плагина 
 // Функция для удаления всех опций плагина
 function wp_smsn1_ru_uninstall() {
