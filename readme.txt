@@ -1,4 +1,4 @@
-﻿=== WP.SMSn1.ru – Integration of SMS notifications, verification, registration and authorization by phone number using a one-time code from SMS. SMS notifications, including for WooCommerce. So far, only for mobile operators in the Russian Federation. ===
+=== WP.SMSn1.ru – Integration of SMS notifications, verification, registration and authorization by phone number using a one-time code from SMS. SMS notifications, including for WooCommerce. So far, only for mobile operators in the Russian Federation. ===
 Contributors: Vasilev Mikhail Y.
 Plugin link: https://wp.smsn1.ru
 Support: https://wp.smsn1.ru/контакты-службы-поддержки/
