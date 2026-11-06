@@ -124,7 +124,7 @@ for ($i = 0; $i < 3; $i++) {
 }
 
 $result = wp_smsn1_ru_otp_can_send($phone, $ip);
-check(is_string($result) && strpos($result, 'на этот номер') !== false, 'лимит 3 кода в час на номер');
+check(is_string($result) && strpos($result, 'на этот номер') !== false, 'лимит 3 кода на номер за окно');
 
 /* 7. Часовой лимит на IP ----------------------------------------------- */
 $ip = '203.0.113.3';
@@ -134,7 +134,7 @@ for ($i = 0; $i < 10; $i++) {
 }
 
 $result = wp_smsn1_ru_otp_can_send('+79995550000', $ip);
-check(is_string($result) && strpos($result, 'Попробуйте позже') !== false, 'лимит 10 кодов в час на IP');
+check(is_string($result) && strpos($result, 'Повторите через') !== false, 'лимит 10 кодов на IP за окно');
 
 /* 8. Независимость номеров --------------------------------------------- */
 check(wp_smsn1_ru_otp_can_send('+79998887766', '203.0.113.4') === true, 'другой номер с другого IP не заблокирован');
