@@ -1,4 +1,4 @@
-# Настройка репозитория на GitHub (описание, topics, защита ветки, релиз).
+﻿# Настройка репозитория на GitHub (описание, topics, защита ветки, релиз).
 # Требует выполненного `gh auth login` (см. README/RUNBOOK в ответе ассистента).
 #
 # Пример:
@@ -64,13 +64,13 @@ Invoke-Gh @(
 )
 
 Write-Host '== Issues включены, Wiki/Projects выключены ==' -ForegroundColor Cyan
-Invoke-Gh @('repo', 'edit', $Repo, '--enable-issues', '--disable-wiki', '--disable-projects')
+Invoke-Gh @('repo', 'edit', $Repo, '--enable-issues', '--enable-wiki=false', '--enable-projects=false')
 
 Write-Host "== Защита ветки $Branch ==" -ForegroundColor Cyan
 $protection = @{
     required_status_checks          = @{
         strict   = $false
-        contexts = @('Build plugin archive', 'PHP 8.3 — syntax check')
+        contexts = @('Build plugin archive', 'PHP 8.3 syntax check')
     }
     enforce_admins                  = $false      # владелец может пушить напрямую
     required_pull_request_reviews   = $null
@@ -79,10 +79,17 @@ $protection = @{
     allow_deletions                 = $false
     required_linear_history         = $false
     required_conversation_resolution = $true
-} | ConvertTo-Json -Depth 6
+}
+$protectionJson = $protection | ConvertTo-Json -Depth 6
 
-$protection | & $gh api --method PUT "repos/$Repo/branches/$Branch/protection" --input -
-if ($LASTEXITCODE -ne 0) { throw 'Не удалось включить защиту ветки.' }
+# Пишем JSON в файл в UTF-8: через конвейер в PS 5.1 не-ASCII символы ломаются
+$protectionFile = Join-Path (Get-Location) '.protection.json'
+[System.IO.File]::WriteAllText($protectionFile, $protectionJson, (New-Object System.Text.UTF8Encoding($false)))
+try {
+    Invoke-Gh @('api', '--method', 'PUT', "repos/$Repo/branches/$Branch/protection", '--input', $protectionFile)
+} finally {
+    Remove-Item $protectionFile -ErrorAction SilentlyContinue
+}
 
 if ($CreateRelease) {
     Write-Host '== Сборка архива и создание релиза ==' -ForegroundColor Cyan

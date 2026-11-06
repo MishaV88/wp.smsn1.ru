@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   lint:
-    name: PHP ${{ matrix.php }} — syntax check
+    name: PHP ${{ matrix.php }} syntax check
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

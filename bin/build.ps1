@@ -1,4 +1,4 @@
-# Собирает устанавливаемый архив плагина в dist/wp-smsn1-ru.zip (Windows)
+﻿# Собирает устанавливаемый архив плагина в dist/wp-smsn1-ru.zip (Windows)
 [CmdletBinding()]
 param()
 
