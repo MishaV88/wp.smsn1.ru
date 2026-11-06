@@ -3,6 +3,10 @@
     <form id="wp-smsn1-ru-login-form">
         <label for="phone_number">Номер телефона:</label>
         <input type="text" id="phone_number" name="phone_number"  placeholder="+79991234567" required>
+        <?php if (wp_smsn1_ru_auth_mode() === 'password_otp') : ?>
+        <label for="user_password">Пароль:</label>
+        <input type="password" id="user_password" name="user_password" autocomplete="current-password" placeholder="Если пароля ещё нет — придумайте его">
+        <?php endif; ?>
         <button type="button" id="send-sms-code">Отправить код</button>        
         <label for="sms_code">Код из СМС:</label>
         <input type="text" id="sms_code" name="sms_code" inputmode="numeric" autocomplete="one-time-code" maxlength="5" placeholder="5 цифр">

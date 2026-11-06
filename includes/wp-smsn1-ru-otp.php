@@ -255,3 +255,18 @@ function wp_smsn1_ru_otp_mark_sent($phone, $ip = null)
         $window
     );
 }
+
+
+/**
+ * Требования к новому паролю.
+ *
+ * @return string|false Текст ошибки или false, если пароль подходит.
+ */
+function wp_smsn1_ru_password_problem($password)
+{
+    if (strlen((string) $password) < 8) {
+        return 'Пароль должен быть не короче 8 символов.';
+    }
+
+    return false;
+}

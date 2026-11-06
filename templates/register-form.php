@@ -5,6 +5,12 @@
         <input type="email" id="reg_email" name="reg_email" placeholder="myemail@domain.test" required>
         <label for="phone_number">Номер телефона(если номер уже зарегестрирован, Вы будете автоматически авторизованы):</label>
         <input type="text" id="phone_number" name="phone_number" placeholder="+79991234567" required>            
+        <?php if (wp_smsn1_ru_auth_mode() === 'password_otp') : ?>
+        <label for="user_password">Пароль (не короче 8 символов):</label>
+        <input type="password" id="user_password" name="user_password" autocomplete="new-password" required>
+        <label for="user_password_confirm">Повторите пароль:</label>
+        <input type="password" id="user_password_confirm" name="user_password_confirm" autocomplete="new-password" required>
+        <?php endif; ?>
         <button type="button" id="send-sms-code">Отправить код</button>       
         <label for="sms_code">Код из СМС:</label>
         <input type="text" id="sms_code" name="sms_code" inputmode="numeric" autocomplete="one-time-code" maxlength="5" placeholder="5 цифр">

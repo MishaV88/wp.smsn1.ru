@@ -113,6 +113,7 @@ function wp_smsn1_ru_register_settings() {
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_api_key', 'sanitize_text_field');
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_email_not_need_mode', 'sanitize_text_field');
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_verphone_on_checkout_mode', 'sanitize_text_field');
+	register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_auth_mode', 'wp_smsn1_ru_sanitize_auth_mode');
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_use_custom_login_form_url', 'sanitize_text_field');
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_use_custom_register_form_url', 'sanitize_text_field');
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_use_custom_login_redirect_url', 'sanitize_text_field');
@@ -142,6 +143,9 @@ function wp_smsn1_ru_register_settings() {
     if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
         add_settings_field('wp_smsn1_ru_verphone_on_checkout_mode', 'Включить верификацию номера телефона на странице оформления заказа', 'wp_smsn1_ru_verphone_on_checkout_mode', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_operating_modes_section');
     }
+
+    add_settings_section('wp_smsn1_ru_auth_section', 'Режим входа', 'wp_smsn1_ru_auth_section_callback', 'wp-smsn1-ru-settings');
+    add_settings_field('wp_smsn1_ru_auth_mode', 'Способ входа', 'wp_smsn1_ru_auth_mode_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_auth_section');
 
     add_settings_section('wp_smsn1_ru_redirects_section', 'Настройки ссылок и перенаправлений(редиректов)', null, 'wp-smsn1-ru-settings');
     add_settings_field('wp_smsn1_ru_use_custom_login_form_url', 'Ссылка на страницу с формой входа на сайт.', 'wp_smsn1_ru_use_custom_login_form_url', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_redirects_section');
@@ -400,5 +404,63 @@ function wp_smsn1_ru_reset_senders_transient_on_option_update($option_name, $old
         // Удаляем транзиент, если он существует
         delete_transient('wp_smsn1_ru_get_senders_temp');
 		delete_transient('wp_smsn1_ru_get_balance_temp');
+    }
+}
+
+/**
+ * Описание раздела «Режим входа».
+ */
+function wp_smsn1_ru_auth_section_callback() {
+    echo '<p>Чем пользователь подтверждает личность при входе.</p>';
+}
+
+/**
+ * Допустимые значения режима входа.
+ */
+function wp_smsn1_ru_sanitize_auth_mode($value) {
+    return in_array($value, array('otp', 'password_otp'), true) ? $value : 'otp';
+}
+
+/**
+ * Переключатель режима входа.
+ */
+function wp_smsn1_ru_auth_mode_callback() {
+    $mode    = wp_smsn1_ru_auth_mode();
+    $options = array(
+        'otp'          => 'Только OTP (код из СМС)',
+        'password_otp' => 'Пароль + OTP (двухфакторный вход)',
+    );
+
+    foreach ($options as $value => $label) {
+        printf(
+            '<label style="display:block;margin-bottom:6px;"><input type="radio" name="wp_smsn1_ru_auth_mode" value="%s"%s> %s</label>',
+            esc_attr($value),
+            checked($mode, $value, false),
+            esc_html($label)
+        );
+    }
+
+    echo '<p class="description">В режиме «Пароль + OTP» на форме входа появляется поле пароля: нужны и пароль, и код из СМС. '
+        . 'Кто ещё не задавал пароль, придумает его при первом входе — он сохранится после подтверждения кода. '
+        . 'Регистрация в этом режиме сразу спрашивает пароль.</p>';
+}
+
+/**
+ * Пользователь сменил пароль в профиле — значит, он его знает.
+ */
+add_action('profile_update', 'wp_smsn1_ru_mark_password_set', 10, 2);
+function wp_smsn1_ru_mark_password_set($user_id, $old_user_data) {
+    if (!empty($_POST['pass1'])) {
+        update_user_meta($user_id, 'wp_smsn1_ru_password_set', 1);
+    }
+}
+
+/**
+ * Пароль сброшен через «Забыли пароль?» — метка тоже нужна.
+ */
+add_action('after_password_reset', 'wp_smsn1_ru_mark_password_set_after_reset');
+function wp_smsn1_ru_mark_password_set_after_reset($user) {
+    if ($user instanceof WP_User) {
+        update_user_meta($user->ID, 'wp_smsn1_ru_password_set', 1);
     }
 }
