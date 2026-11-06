@@ -89,6 +89,13 @@ jQuery(document).ready(function($) {
     // Проверка кода и авторизация
     $('#wp-smsn1-ru-register-form, #wp-smsn1-ru-login-form').on('submit', function(e) {
         e.preventDefault(); // Отменяем стандартное поведение формы
+
+        var pwd  = $('#user_password').val() || '';
+        var pwd2 = $('#user_password_confirm').val() || '';
+        if (pwd2 !== '' && pwd !== pwd2) {
+            $('#wp-smsn1-ru-message').html('Пароли не совпадают.');
+            return;
+        }
         if($('#sms_code').css('display') === 'none') {	//Проверяем код ввобще введен
 			$('#wp-smsn1-ru-message').html('Получите и введите код из СМС.');
 			return;
@@ -108,6 +115,8 @@ jQuery(document).ready(function($) {
 				reg_email: reg_email,
 				type_of_form: type_of_form,
                 sms_code: smsCode,
+				user_password: $('#user_password').val(),
+				user_password_confirm: $('#user_password_confirm').val(),
                 nonce: wp_smsn1_ru_ajax.nonce
             },
             success: function(response) {
