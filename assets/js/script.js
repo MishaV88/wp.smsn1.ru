@@ -79,8 +79,9 @@ jQuery(document).ready(function($) {
 					$('#wp-smsn1-ru-message').html(response.data);
 				}
             },
-            error: function() {
-                $('#wp-smsn1-ru-message').html('Ошибка при отправке запроса.');
+            error: function(xhr) {
+                var msg = (xhr && xhr.responseJSON && xhr.responseJSON.data) ? xhr.responseJSON.data : 'Ошибка при отправке запроса.';
+                $('#wp-smsn1-ru-message').html(msg);
             }
         });
     });
@@ -120,8 +121,9 @@ jQuery(document).ready(function($) {
                     $('#wp-smsn1-ru-message').html(response.data);
                 }
             },
-            error: function() {
-                $('#wp-smsn1-ru-message').html('Ошибка при отправке запроса.');
+            error: function(xhr) {
+                var msg = (xhr && xhr.responseJSON && xhr.responseJSON.data) ? xhr.responseJSON.data : 'Ошибка при отправке запроса.';
+                $('#wp-smsn1-ru-message').html(msg);
             }
         });
     });
@@ -156,9 +158,10 @@ jQuery(document).ready(function($) {
 						$('#wp-smsn1-ru-message').html(response.data);
 					}
 				},
-				error: function() {
-					$('#wp-smsn1-ru-message').html('Ошибка при отправке запроса.');
-				}
+				error: function(xhr) {
+                var msg = (xhr && xhr.responseJSON && xhr.responseJSON.data) ? xhr.responseJSON.data : 'Ошибка при отправке запроса.';
+                $('#wp-smsn1-ru-message').html(msg);
+            }
 			});
 		});
 	});
@@ -189,9 +192,10 @@ jQuery(document).ready(function($) {
                         alert('Ошибка при проверке номера телефона.');
                     }
                 },
-                error: function() {
-                    alert('Ошибка при отправке запроса.');
-                }
+                error: function(xhr) {
+                var msg = (xhr && xhr.responseJSON && xhr.responseJSON.data) ? xhr.responseJSON.data : 'Ошибка при отправке запроса.';
+                alert(msg);
+            }
             });
         }
     });

@@ -130,8 +130,8 @@ function wp_smsn1_ru_locate_template($template_name) {
 }
 // Подключение скриптов и стилей
 function wp_smsn1_ru_scripts() {
-    wp_enqueue_style('wp-smsn1-ru-style', plugins_url('/assets/css/style.css', __FILE__));
-    wp_enqueue_script('wp-smsn1-ru-script', plugins_url('/assets/js/script.js', __FILE__), array('jquery'), null, true);
+    wp_enqueue_style('wp-smsn1-ru-style', plugins_url('/assets/css/style.css', __FILE__), array(), WP_SMSN1_RU_VERSION);
+    wp_enqueue_script('wp-smsn1-ru-script', plugins_url('/assets/js/script.js', __FILE__), array('jquery'), WP_SMSN1_RU_VERSION, true);
     
     // Локализация скрипта для AJAX
     wp_localize_script('wp-smsn1-ru-script', 'wp_smsn1_ru_ajax', array(
@@ -191,21 +191,21 @@ function handle_send_sms_code() {
     $phone_number = isset($_POST['phone_number']) ? sanitize_my_phone_for_field(wp_unslash($_POST['phone_number'])) : 'not_russian_num';
 
     if ($phone_number === 'not_russian_num') {
-        wp_send_json_error('Проверьте номер телефона, на текущий момент доставка СМС осуществляется только на номера Российской Федерации', 400);
+        wp_send_json_error('Проверьте номер телефона, на текущий момент доставка СМС осуществляется только на номера Российской Федерации');
     }
 
     $type_of_form = isset($_POST['type_of_form']) ? sanitize_text_field(wp_unslash($_POST['type_of_form'])) : '';
 
     if ($type_of_form === 'login' && !wp_smsn1_ru_get_user_by_phone($phone_number)) {
         $register_url = home_url('/') . get_option('wp_smsn1_ru_use_custom_register_form_url', 'registation-by-wp-smsn1-ru');
-        wp_send_json_error('Телефонный номер не найден, просьба <a href="' . esc_url($register_url) . '">зарегестрироваться(30 секунд)</a><style>.wp-smsn1-ru-form button[type="submit"]{background-color: #bbb;} .wp-smsn1-ru-form button[type="submit"] ~ button{    background-color: #0073aa; } </style>', 404);
+        wp_send_json_error('Телефонный номер не найден, просьба <a href="' . esc_url($register_url) . '">зарегестрироваться(30 секунд)</a><style>.wp-smsn1-ru-form button[type="submit"]{background-color: #bbb;} .wp-smsn1-ru-form button[type="submit"] ~ button{    background-color: #0073aa; } </style>');
     }
 
     // Защита от SMS-бомбинга: пауза между отправками и часовые лимиты на номер и IP
     $can_send = wp_smsn1_ru_otp_can_send($phone_number);
 
     if ($can_send !== true) {
-        wp_send_json_error($can_send, 429);
+        wp_send_json_error($can_send);
     }
 
     $sms_code = wp_smsn1_ru_otp_generate();
@@ -216,7 +216,7 @@ function handle_send_sms_code() {
 
     if ($sms_sent !== true) {
         $message = is_numeric($sms_sent) ? '#' . $sms_sent : $sms_sent;
-        wp_send_json_error('Ошибка при отправке СМС: ' . $message, 502);
+        wp_send_json_error('Ошибка при отправке СМС: ' . $message);
     }
 
     wp_smsn1_ru_otp_store($phone_number, $sms_code);
@@ -232,7 +232,7 @@ function handle_verify_sms_code() {
     $phone_number = isset($_POST['phone_number']) ? sanitize_my_phone_for_field(wp_unslash($_POST['phone_number'])) : 'not_russian_num';
 
     if ($phone_number === 'not_russian_num') {
-        wp_send_json_error('Проверьте номер телефона, на текущий момент доставка СМС осуществляется только на номера Российской Федерации', 400);
+        wp_send_json_error('Проверьте номер телефона, на текущий момент доставка СМС осуществляется только на номера Российской Федерации');
     }
 
     $user_code = isset($_POST['sms_code']) ? sanitize_text_field(wp_unslash($_POST['sms_code'])) : '';
@@ -246,11 +246,11 @@ function handle_verify_sms_code() {
         $email_required = get_option('wp_smsn1_ru_email_not_need_mode') !== 'yes';
 
         if ($email_required && !is_email($email)) {
-            wp_send_json_error('Укажите корректный e-mail: он потребуется для восстановления доступа.', 400);
+            wp_send_json_error('Укажите корректный e-mail: он потребуется для восстановления доступа.');
         }
 
         if ($email !== '' && email_exists($email)) {
-            wp_send_json_error('Этот e-mail уже зарегистрирован.', 409);
+            wp_send_json_error('Этот e-mail уже зарегистрирован.');
         }
     }
 
@@ -258,7 +258,7 @@ function handle_verify_sms_code() {
     $checked = wp_smsn1_ru_otp_check($phone_number, $user_code);
 
     if ($checked !== true) {
-        wp_send_json_error($checked, 400);
+        wp_send_json_error($checked);
     }
 
     $message = 'Успешная авторизация.';
@@ -267,11 +267,11 @@ function handle_verify_sms_code() {
         $user_id = wp_smsn1_ru_create_user($phone_number, $email);
 
         if (is_wp_error($user_id)) {
-            wp_send_json_error('Ошибка при создании пользователя: ' . $user_id->get_error_message(), 500);
+            wp_send_json_error('Ошибка при создании пользователя: ' . $user_id->get_error_message());
         }
 
         if (!$user_id) {
-            wp_send_json_error('Ошибка при создании пользователя.', 500);
+            wp_send_json_error('Ошибка при создании пользователя.');
         }
 
         $message = 'Успешная регистрация, Вы авторизованы.';
@@ -280,7 +280,7 @@ function handle_verify_sms_code() {
     $user = get_user_by('id', $user_id);
 
     if (!$user) {
-        wp_send_json_error('Не удалось загрузить учётную запись.', 500);
+        wp_send_json_error('Не удалось загрузить учётную запись.');
     }
 
     wp_set_current_user($user_id);
