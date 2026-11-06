@@ -1,4 +1,4 @@
-﻿=== WP.SMSn1.ru – Integration of SMS notifications, verification, registration and authorization by phone number using a one-time code from SMS. SMS notifications, including for WooCommerce. So far, only for mobile operators in the Russian Federation. ===
+=== WP.SMSn1.ru – Integration of SMS notifications, verification, registration and authorization by phone number using a one-time code from SMS. SMS notifications, including for WooCommerce. So far, only for mobile operators in the Russian Federation. ===
 Contributors: Vasilev Mikhail Y.
 Plugin link: https://wp.smsn1.ru
 Support: https://wp.smsn1.ru/контакты-службы-поддержки/
@@ -6,7 +6,7 @@ Tags: sms, notification, woocommerce, OTP, verification, one time password,login
 Requires at least: 4.1
 Tested up to: 6.7
 Requires PHP: 5.6
-Stable tag: 6.9.11
+Stable tag: 1.0
 License: GPL-2.0+
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,4 +60,7 @@ wp_smsn1_ru_get_senders() - возвращает доступные имена �
 == Upgrade Notice ==
 == Changelog ==
 
-[See changelog for all versions](https://raw.githubusercontent.com/wp-sms/wp-sms/master/CHANGELOG.md).
+= 1.0 =
+* Исправления безопасности, коды ошибок API, ссылки.
+
+Полная история изменений: https://github.com/MishaV88/wp.smsn1.ru/blob/main/CHANGELOG.md

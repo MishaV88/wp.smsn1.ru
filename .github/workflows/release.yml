@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Verify tag matches plugin version
+        run: |
+          version=$(grep -m1 -E '^[[:space:]]*\*?[[:space:]]*Version:' wp-smsn1-ru.php \
+            | sed -E 's/.*Version:[[:space:]]*//' | tr -d '\r ')
+          tag="${GITHUB_REF_NAME#v}"
+          echo "plugin version: $version / tag: $tag"
+          if [ "$version" != "$tag" ]; then
+            echo "::error::Версия в заголовке плагина ($version) не совпадает с тегом ($tag)."
+            exit 1
+          fi
+
+      - name: Build plugin archive
+        run: bash bin/build.sh
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/wp-smsn1-ru.zip
+          fail_on_unmatched_files: true
+          generate_release_notes: true

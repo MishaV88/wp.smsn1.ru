@@ -1,0 +1,61 @@
+.wp-smsn1-ru-form {
+    max-width: 400px;
+    margin: 10px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.wp-smsn1-ru-form label {
+    display: block;
+    margin-bottom: 10px;
+}
+	
+.wp-smsn1-ru-form input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+.wp-smsn1-ru-form button {
+    padding: 10px 15px;
+    background-color: #0073aa;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.wp-smsn1-ru-form .grey {
+
+    background-color: #bbb;
+
+}
+.wp-smsn1-ru-form button[type="submit"] {
+	background-color: #bbb;
+}
+.wp-smsn1-ru-form button:hover {
+    background-color: #005177;
+}
+
+#wp-smsn1-ru-message {
+    margin-top: 10px;
+    color: #ff0000;
+}
+label[for="sms_code"], #sms_code {
+	display: none;
+	/* font-size: 0px;*/
+}	
+#send-sms-code {
+	display: list-item;
+	margin-bottom: 5px;
+}	
+.wp-smsn1-ru-form p.privacy-policy-url {
+	text-align: center;
+	margin-bottom: 0px;
+}	
+.wp-smsn1-ru-form p.privacy-policy-url > a{
+	color: #0073aa;
+    text-decoration: underline;
+}	

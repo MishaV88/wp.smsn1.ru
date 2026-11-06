@@ -1,0 +1,48 @@
+name: Предложение
+description: Новая возможность или улучшение
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Плагин развивается в сторону альтернативных способов входа (Telegram, VK ID), MAX отложен.
+        Если предложение касается входа через соцсети — укажите сценарий и регион аудитории.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Какую задачу решает
+      description: Опишите проблему пользователя, а не готовое решение.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Предлагаемое решение
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Альтернативы
+      description: Что ещё рассматривали (в т.ч. готовые плагины).
+    validations:
+      required: false
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Область
+      options:
+        - Вход/регистрация по телефону (OTP)
+        - Telegram Login
+        - VK ID
+        - MAX
+        - WooCommerce
+        - Настройки и админка
+        - API smsn1.ru
+        - Другое
+    validations:
+      required: true

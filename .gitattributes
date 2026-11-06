@@ -1,0 +1,22 @@
+# Нормализация переводов строк: в репозитории всегда LF
+* text=auto eol=lf
+
+# Исходный код
+*.php   text diff=php
+*.css   text
+*.js    text
+*.json  text
+*.yml   text
+*.md    text
+*.txt   text
+
+# Бинарные файлы
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.zip   binary
+
+# Артефакты сборки не показываем в diff и статистике
+/dist/** -diff linguist-vendored

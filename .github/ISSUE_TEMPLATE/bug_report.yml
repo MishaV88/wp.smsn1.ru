@@ -1,0 +1,85 @@
+name: Сообщение об ошибке
+description: Что-то работает не так — вход, отправка СМС, WooCommerce, настройки
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Спасибо за отчёт! Чем точнее данные, тем быстрее получится воспроизвести проблему.
+        **Не прикладывайте** логин, API-ключ и полные номера телефонов — маскируйте их.
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Что произошло
+      description: Опишите фактическое поведение и ожидаемое.
+      placeholder: При вводе кода из СМС форма показывает «Неверный код», хотя код верный.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Шаги воспроизведения
+      placeholder: |
+        1. Открыть /login-by-wp-smsn1-ru
+        2. Ввести номер +7...
+        3. Нажать «Отправить код»
+        4. ...
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Версия плагина
+      placeholder: 1.0
+    validations:
+      required: true
+
+  - type: input
+    id: wp-version
+    attributes:
+      label: Версия WordPress
+      placeholder: 6.7
+    validations:
+      required: true
+
+  - type: input
+    id: php-version
+    attributes:
+      label: Версия PHP
+      placeholder: 8.2
+    validations:
+      required: true
+
+  - type: dropdown
+    id: woocommerce
+    attributes:
+      label: WooCommerce
+      options:
+        - Не используется
+        - Активирован, проблема на checkout
+        - Активирован, проблема вне checkout
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Логи и сообщения об ошибках
+      description: |
+        `wp-content/debug.log` (при `WP_DEBUG_LOG`), ответы AJAX из консоли браузера,
+        код ошибки API smsn1.ru (см. таблицу «Коды ошибок API» в настройках плагина).
+      render: shell
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Проверки
+      options:
+        - label: Баланс в личном кабинете smsn1.ru больше 10 ₽
+        - label: Отправитель СМС выбран в настройках плагина
+        - label: Проблема воспроизводится на стандартной теме (например, Twenty Twenty-Four)

@@ -1,0 +1,22 @@
+# Сборки и артефакты
+/dist/
+/build/
+*.zip
+
+# Локальные настройки редакторов и IDE
+.idea/
+.vscode/
+*.code-workspace
+*.swp
+*~
+
+# ОС и мусор
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Зависимости (на случай появления composer/npm)
+/vendor/
+/node_modules/
+composer.lock
+package-lock.json
