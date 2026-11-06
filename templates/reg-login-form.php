@@ -6,7 +6,7 @@
         <input type="text" id="phone_number" name="phone_number"  placeholder="+79991234567" required>
         <button type="button" id="send-sms-code">Отправить код</button>        
         <label for="sms_code">Код из СМС:</label>
-        <input type="text" id="sms_code" name="sms_code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6 цифр">
+        <input type="text" id="sms_code" name="sms_code" inputmode="numeric" autocomplete="one-time-code" maxlength="5" placeholder="5 цифр">
 		<input type="hidden" id="type_of_form" name="type_of_form" value="reg-login" />
 		<input type="hidden" id="wp_smsn1_ru_use_custom_login_redirect_url" name="wp_smsn1_ru_use_custom_login_redirect_url" value="<?= get_option('wp_smsn1_ru_use_custom_login_redirect_url');  ?>" />
         <button type="submit">Войти/Зарегестрироваться</button>

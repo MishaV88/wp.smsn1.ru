@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
 }
 
 if (!defined('WP_SMSN1_RU_OTP_TTL')) {
-    define('WP_SMSN1_RU_OTP_TTL', 300); // 5 минут
+    define('WP_SMSN1_RU_OTP_TTL', 90); // 90 секунд
 }
 
 /**
@@ -24,7 +24,7 @@ function wp_smsn1_ru_otp_phone_key($phone)
 
 function wp_smsn1_ru_otp_generate()
 {
-    return (string) wp_rand(100000, 999999);
+    return (string) wp_rand(10000, 99999);
 }
 
 /**
@@ -103,7 +103,7 @@ function wp_smsn1_ru_otp_check($phone, $code, $consume = true)
     $code = (string) $code;
 
     // Коды, выданные до 1.1.0, были четырёхзначными: они доживают свой TTL.
-    $expected_length = !empty($record['legacy']) ? 4 : 6;
+    $expected_length = !empty($record['legacy']) ? 4 : 5;
 
     if (strlen($code) === $expected_length && hash_equals($record['code'], $code)) {
         if ($consume) {

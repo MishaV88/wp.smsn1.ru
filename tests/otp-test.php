@@ -66,7 +66,7 @@ function check($condition, $label)
 
 /* 1. Формат кода ------------------------------------------------------- */
 $code = wp_smsn1_ru_otp_generate();
-check((bool) preg_match('/^\d{6}$/', $code), 'код состоит из 6 цифр');
+check((bool) preg_match('/^\d{5}$/', $code), 'код состоит из 5 цифр');
 
 /* 2. Успешная проверка и расход кода ----------------------------------- */
 $phone = '+79990000001';
@@ -82,17 +82,17 @@ $phone = '+79990000002';
 $code  = wp_smsn1_ru_otp_generate();
 wp_smsn1_ru_otp_store($phone, $code);
 
-$result = wp_smsn1_ru_otp_check($phone, '000000');
+$result = wp_smsn1_ru_otp_check($phone, '00000');
 check(is_string($result) && strpos($result, 'Неверный код') === 0, 'неверный код отклоняется');
 
 $record = wp_smsn1_ru_otp_get($phone);
 check(is_array($record) && $record['attempts'] === 1, 'счётчик попыток увеличивается');
 
 for ($i = 0; $i < 3; $i++) {
-    wp_smsn1_ru_otp_check($phone, '000000');
+    wp_smsn1_ru_otp_check($phone, '00000');
 }
 
-$result = wp_smsn1_ru_otp_check($phone, '000000');
+$result = wp_smsn1_ru_otp_check($phone, '00000');
 check(is_string($result) && strpos($result, 'Слишком много') !== false, 'после 5 попыток код блокируется');
 check(wp_smsn1_ru_otp_get($phone) === false, 'после блокировки код удалён');
 check(wp_smsn1_ru_otp_check($phone, $code) !== true, 'верный код после блокировки не принимается');
