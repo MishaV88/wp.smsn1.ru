@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: PHP ${{ matrix.php }} — syntax check
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Lint all PHP files
+        run: |
+          set -o pipefail
+          find . -name '*.php' -not -path './.git/*' -not -path './dist/*' -print0 \
+            | xargs -0 -n1 -P4 php -l
+
+  build:
+    name: Build plugin archive
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Check Version / Stable tag / CHANGELOG (informational)
+        run: php bin/check-version.php || echo "::warning::Версия в заголовке плагина, Stable tag и CHANGELOG расходятся — см. вывод выше."
+
+      - name: Build dist/wp-smsn1-ru.zip
+        run: bash bin/build.sh
+
+      - name: Show archive contents
+        run: unzip -l dist/wp-smsn1-ru.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wp-smsn1-ru
+          path: dist/wp-smsn1-ru.zip
+          if-no-files-found: error

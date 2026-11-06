@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Поддержка плагина (сайт)
+    url: https://wp.smsn1.ru/
+    about: Вопросы по настройке, оплате СМС, подключению номера отправителя
+  - name: Telegram-поддержка
+    url: https://t.me/sup_smsn1_ru
+    about: Быстрая связь со службой поддержки
+  - name: Инструкция по настройке
+    url: https://wp.smsn1.ru/
+    about: Пошаговая настройка плагина и сервиса smsn1.ru
