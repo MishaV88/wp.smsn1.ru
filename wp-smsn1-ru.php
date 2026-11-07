@@ -5,7 +5,7 @@
  * Plugin URI:  https://wp.smsn1.ru/
  * Author URI:  https://docs-group.ru/
  * Support URI: https://wp.smsn1.ru/контакты-службы-поддержки/
- * Version: 1.2.0
+ * Version: 1.3.0
  * Author: Vasilev Mikhail Y.
  * License:     GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -16,12 +16,16 @@ if (!defined('ABSPATH')) {
 }
 
 if (!defined('WP_SMSN1_RU_VERSION')) {
-    define('WP_SMSN1_RU_VERSION', '1.2.0');
+    define('WP_SMSN1_RU_VERSION', '1.3.0');
 }
 
 // Подключение необходимых файлов
 require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-functions.php'; //Функции необходимые для работы с wp.smsn1.ru(если быть точнее direct.docs-group.ru)
 require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-otp.php'; // OTP: генерация, лимит попыток, защита от SMS-бомбинга
+require_once plugin_dir_path(__FILE__) . 'includes/auth/interface-wp-smsn1-ru-auth-provider.php';
+require_once plugin_dir_path(__FILE__) . 'includes/auth/functions-pkce.php';
+require_once plugin_dir_path(__FILE__) . 'includes/auth/class-wp-smsn1-ru-provider-vk.php';
+require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-oauth.php';
 require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-admin.php'; //Этот файл будет содержать код для добавления настроек плагина в административной панели.
 // Проверка работоспособности плагина и активирован ли WooCommerce
 if (  wp_smsn1_ru_get_balance() >= 10 && wp_smsn1_ru_get_balance() != "Проблема с соединением" && in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) )) {
@@ -90,6 +94,8 @@ function wp_smsn1_ru_create_pages_on_activation() {
 }
 // Регистрируем функцию создания страниц при активации плагина
 register_activation_hook(__FILE__, 'wp_smsn1_ru_create_pages_on_activation');
+// Правила перезаписи нужны для чистого redirect URL OAuth
+register_activation_hook(__FILE__, 'flush_rewrite_rules');
 
 
 // Инициализация плагина

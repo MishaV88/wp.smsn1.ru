@@ -47,6 +47,7 @@ function wp_rand($min, $max)
 }
 
 require dirname(__DIR__) . '/includes/wp-smsn1-ru-otp.php';
+require dirname(__DIR__) . '/includes/auth/functions-pkce.php';
 
 $GLOBALS['wpsmsn1_failures'] = 0;
 $GLOBALS['wpsmsn1_tests']    = 0;
@@ -140,7 +141,19 @@ check(is_string($result) && strpos($result, 'Повторите через') !==
 check(wp_smsn1_ru_password_problem('1234567') !== false, 'короткий пароль отклоняется');
 check(wp_smsn1_ru_password_problem('12345678') === false, 'пароль из 8 символов принимается');
 
-/* 9. Независимость номеров --------------------------------------------- */
+/* 9. PKCE (RFC 7636) -------------------------------------------------- */
+check(
+    wp_smsn1_ru_pkce_challenge('dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk')
+        === 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM',
+    'PKCE S256 совпадает с вектором RFC 7636'
+);
+check(strlen(wp_smsn1_ru_pkce_verifier()) >= 43, 'code_verifier не короче 43 символов');
+check(
+    (bool) preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', wp_smsn1_ru_device_id()),
+    'device_id — UUID v4'
+);
+
+/* 10. Независимость номеров --------------------------------------------- */
 check(wp_smsn1_ru_otp_can_send('+79998887766', '203.0.113.4') === true, 'другой номер с другого IP не заблокирован');
 
 /* Итог ---------------------------------------------------------------- */

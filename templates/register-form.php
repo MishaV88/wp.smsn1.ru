@@ -1,5 +1,6 @@
 <div class="wp-smsn1-ru-form">
     <h2>Регистрация</h2>
+    <?php if (function_exists('wp_smsn1_ru_oauth_buttons_html')) { echo wp_smsn1_ru_oauth_buttons_html(); } ?>
     <form id="wp-smsn1-ru-register-form">
         <label for="reg_email">E-mail(укажите корректный адрес электронной почты, он потребуется для восстановления пароля в случае возникновения проблем с отправкой СМС):</label>
         <input type="email" id="reg_email" name="reg_email" placeholder="myemail@domain.test" required>
