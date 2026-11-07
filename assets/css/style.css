@@ -59,3 +59,25 @@ label[for="sms_code"], #sms_code {
 	color: #0073aa;
     text-decoration: underline;
 }	
+
+
+.wp-smsn1-ru-oauth {
+    margin: 0 0 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.wp-smsn1-ru-oauth-button {
+    display: block;
+    padding: 10px 15px;
+    margin-bottom: 8px;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 4px;
+    background: #0077ff;
+    color: #fff !important;
+}
+
+.wp-smsn1-ru-oauth-button:hover {
+    background: #0060cc;
+}

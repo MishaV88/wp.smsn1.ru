@@ -114,6 +114,9 @@ function wp_smsn1_ru_register_settings() {
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_email_not_need_mode', 'sanitize_text_field');
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_verphone_on_checkout_mode', 'sanitize_text_field');
 	register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_auth_mode', 'wp_smsn1_ru_sanitize_auth_mode');
+	register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_vk_enabled', 'sanitize_text_field');
+	register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_vk_client_id', 'sanitize_text_field');
+	register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_vk_client_secret', 'sanitize_text_field');
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_use_custom_login_form_url', 'sanitize_text_field');
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_use_custom_register_form_url', 'sanitize_text_field');
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_use_custom_login_redirect_url', 'sanitize_text_field');
@@ -146,6 +149,12 @@ function wp_smsn1_ru_register_settings() {
 
     add_settings_section('wp_smsn1_ru_auth_section', 'Режим входа', 'wp_smsn1_ru_auth_section_callback', 'wp-smsn1-ru-settings');
     add_settings_field('wp_smsn1_ru_auth_mode', 'Способ входа', 'wp_smsn1_ru_auth_mode_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_auth_section');
+
+    add_settings_section('wp_smsn1_ru_oauth_section', 'Способы входа', 'wp_smsn1_ru_oauth_section_callback', 'wp-smsn1-ru-settings');
+    add_settings_field('wp_smsn1_ru_vk_enabled', 'VK ID', 'wp_smsn1_ru_vk_enabled_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_oauth_section');
+    add_settings_field('wp_smsn1_ru_vk_client_id', 'VK ID: ID приложения', 'wp_smsn1_ru_vk_client_id_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_oauth_section');
+    add_settings_field('wp_smsn1_ru_vk_client_secret', 'VK ID: защищённый ключ', 'wp_smsn1_ru_vk_client_secret_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_oauth_section');
+    add_settings_field('wp_smsn1_ru_vk_redirect', 'VK ID: Redirect URI', 'wp_smsn1_ru_vk_redirect_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_oauth_section');
 
     add_settings_section('wp_smsn1_ru_redirects_section', 'Настройки ссылок и перенаправлений(редиректов)', null, 'wp-smsn1-ru-settings');
     add_settings_field('wp_smsn1_ru_use_custom_login_form_url', 'Ссылка на страницу с формой входа на сайт.', 'wp_smsn1_ru_use_custom_login_form_url', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_redirects_section');
@@ -463,4 +472,33 @@ function wp_smsn1_ru_mark_password_set_after_reset($user) {
     if ($user instanceof WP_User) {
         update_user_meta($user->ID, 'wp_smsn1_ru_password_set', 1);
     }
+}
+
+
+/**
+ * Описание раздела «Способы входа».
+ */
+function wp_smsn1_ru_oauth_section_callback() {
+    echo '<p>Вход через внешние сервисы. Кнопки появляются на формах входа и регистрации, если сервис включён и настроен.</p>';
+}
+
+function wp_smsn1_ru_vk_enabled_callback() {
+    $checked = get_option('wp_smsn1_ru_vk_enabled') === 'yes' ? 'checked' : '';
+    echo '<input type="checkbox" name="wp_smsn1_ru_vk_enabled" value="yes" ' . $checked . ' /> Показывать «Войти через VK ID»';
+}
+
+function wp_smsn1_ru_vk_client_id_callback() {
+    echo '<input type="text" name="wp_smsn1_ru_vk_client_id" value="' . esc_attr((string) get_option('wp_smsn1_ru_vk_client_id')) . '" class="regular-text" placeholder="12345678">';
+    echo '<p class="description">ID приложения из кабинета VK ID (dev.vk.com → приложение → платформа «Веб»).</p>';
+}
+
+function wp_smsn1_ru_vk_client_secret_callback() {
+    echo '<input type="password" name="wp_smsn1_ru_vk_client_secret" value="' . esc_attr((string) get_option('wp_smsn1_ru_vk_client_secret')) . '" class="regular-text" autocomplete="new-password">';
+    echo '<p class="description">Защищённый ключ. Для OAuth 2.1 с PKCE может не понадобиться — оставьте пустым, если VK ID его не требует.</p>';
+}
+
+function wp_smsn1_ru_vk_redirect_callback() {
+    $url = function_exists('wp_smsn1_ru_oauth_redirect_uri') ? wp_smsn1_ru_oauth_redirect_uri() : '';
+    echo '<input type="text" readonly value="' . esc_attr($url) . '" class="large-text code" onclick="this.select();">';
+    echo '<p class="description">Добавьте этот адрес в приложении VK ID как доверенный redirect URI — точно, вместе с https.</p>';
 }

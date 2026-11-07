@@ -1,5 +1,6 @@
 <div class="wp-smsn1-ru-form">
     <h2>Войти на сайт</h2>
+    <?php if (function_exists('wp_smsn1_ru_oauth_buttons_html')) { echo wp_smsn1_ru_oauth_buttons_html(); } ?>
 	<p>Если у Вас еще нет учетной записи, она будет создана</p>
     <form id="wp-smsn1-ru-login-form">
         <label for="phone_number">Номер телефона:</label>
