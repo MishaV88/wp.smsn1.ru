@@ -23,20 +23,24 @@ interface WP_SMSN1_RU_Auth_Provider
     /**
      * URL, куда отправляем пользователя.
      *
-     * @param string $state         Одноразовый state.
+     * @param string $state         Одноразовый state (не короче 32 символов).
      * @param string $code_verifier PKCE verifier.
      * @param string $redirect_uri  Точный redirect_uri, зарегистрированный в приложении.
-     * @param string $device_id     UUID устройства (нужен VK ID).
      * @return string
      */
-    public function get_authorize_url($state, $code_verifier, $redirect_uri, $device_id);
+    public function get_authorize_url($state, $code_verifier, $redirect_uri);
 
     /**
      * Обмен кода на токен.
      *
+     * @param string $code          Код подтверждения из callback.
+     * @param string $code_verifier PKCE verifier.
+     * @param string $redirect_uri  Тот же redirect_uri, что и в авторизации.
+     * @param string $device_id     device_id, который вернул провайдер.
+     * @param string $state         State из callback.
      * @return array|WP_Error
      */
-    public function exchange_code($code, $code_verifier, $redirect_uri, $device_id);
+    public function exchange_code($code, $code_verifier, $redirect_uri, $device_id, $state);
 
     /**
      * Профиль пользователя по данным токена.

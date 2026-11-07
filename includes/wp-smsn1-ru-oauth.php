@@ -137,9 +137,9 @@ function wp_smsn1_ru_oauth_start()
 
     $link = !empty($_GET['link']) && is_user_logged_in();
 
-    $state     = wp_smsn1_ru_random_hex(16);
-    $verifier  = wp_smsn1_ru_pkce_verifier();
-    $device_id = wp_smsn1_ru_device_id();
+    // VK (и другие провайдеры) требуют state не короче 32 символов
+    $state    = wp_smsn1_ru_random_hex(16);
+    $verifier = wp_smsn1_ru_pkce_verifier();
 
     $redirect_to = isset($_GET['redirect_to'])
         ? wp_validate_redirect(wp_unslash($_GET['redirect_to']), home_url('/'))
@@ -150,14 +150,13 @@ function wp_smsn1_ru_oauth_start()
         array(
             'provider'    => $provider_id,
             'verifier'    => $verifier,
-            'device_id'   => $device_id,
             'link'        => $link ? get_current_user_id() : 0,
             'redirect_to' => $redirect_to,
         ),
         10 * MINUTE_IN_SECONDS
     );
 
-    $url = $provider->get_authorize_url($state, $verifier, wp_smsn1_ru_oauth_redirect_uri(), $device_id);
+    $url = $provider->get_authorize_url($state, $verifier, wp_smsn1_ru_oauth_redirect_uri());
 
     wp_redirect($url);
     exit;
@@ -178,8 +177,10 @@ function wp_smsn1_ru_oauth_callback()
         );
     }
 
-    $state = isset($_GET['state']) ? sanitize_text_field(wp_unslash($_GET['state'])) : '';
-    $code  = isset($_GET['code']) ? sanitize_text_field(wp_unslash($_GET['code'])) : '';
+    $state     = isset($_GET['state']) ? sanitize_text_field(wp_unslash($_GET['state'])) : '';
+    $code      = isset($_GET['code']) ? sanitize_text_field(wp_unslash($_GET['code'])) : '';
+    // device_id возвращает сам провайдер вместе с кодом подтверждения
+    $device_id = isset($_GET['device_id']) ? sanitize_text_field(wp_unslash($_GET['device_id'])) : '';
     $key   = 'wp_smsn1_ru_oauth_' . $state;
     $data  = get_transient($key);
 
@@ -200,7 +201,7 @@ function wp_smsn1_ru_oauth_callback()
         wp_die(esc_html('Провайдер входа недоступен.'), esc_html('Вход не выполнен'), array('response' => 400));
     }
 
-    $token = $provider->exchange_code($code, $data['verifier'], wp_smsn1_ru_oauth_redirect_uri(), $data['device_id']);
+    $token = $provider->exchange_code($code, $data['verifier'], wp_smsn1_ru_oauth_redirect_uri(), $device_id, $state);
 
     if (is_wp_error($token)) {
         wp_die(
