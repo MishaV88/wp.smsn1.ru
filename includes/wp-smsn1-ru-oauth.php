@@ -53,12 +53,67 @@ function wp_smsn1_ru_oauth_get_provider($id)
 /**
  * Точный redirect_uri — его же нужно указать в настройках приложения провайдера.
  *
+ * VK ID (как и многие провайдеры) не разрешает query-параметры в redirect URL,
+ * поэтому используется чистый путь /wp-smsn1-ru-oauth/ через rewrite-правило.
+ *
  * @return string
  */
 function wp_smsn1_ru_oauth_redirect_uri()
 {
-    return admin_url('admin-post.php?action=wp_smsn1_ru_oauth_callback');
+    return home_url('/wp-smsn1-ru-oauth/');
 }
+
+/**
+ * Rewrite-правило для чистого redirect URL без query-параметров.
+ */
+function wp_smsn1_ru_oauth_add_rewrite()
+{
+    add_rewrite_rule('^wp-smsn1-ru-oauth/?$', 'index.php?wp_smsn1_ru_oauth_callback=1', 'top');
+}
+add_action('init', 'wp_smsn1_ru_oauth_add_rewrite', 5);
+
+/**
+ * Регистрирует query-переменную rewrite-правила.
+ */
+function wp_smsn1_ru_oauth_query_vars($vars)
+{
+    $vars[] = 'wp_smsn1_ru_oauth_callback';
+
+    return $vars;
+}
+add_filter('query_vars', 'wp_smsn1_ru_oauth_query_vars');
+
+/**
+ * Обработка callback по rewrite-адресу, а также защита от «голых» code+state
+ * на любой странице (если правила перезаписи ещё не обновились).
+ */
+function wp_smsn1_ru_oauth_maybe_callback()
+{
+    $is_callback = (bool) get_query_var('wp_smsn1_ru_oauth_callback');
+
+    // Запасной вариант: code+state пришли на любую страницу, а state нам известен.
+    if (!$is_callback && !empty($_GET['code']) && !empty($_GET['state'])) {
+        $state = sanitize_text_field(wp_unslash($_GET['state']));
+        $is_callback = (bool) get_transient('wp_smsn1_ru_oauth_' . $state);
+    }
+
+    if ($is_callback) {
+        wp_smsn1_ru_oauth_callback();
+    }
+}
+add_action('template_redirect', 'wp_smsn1_ru_oauth_maybe_callback', 1);
+
+/**
+ * Сбрасывает правила перезаписи после обновления плагина.
+ */
+function wp_smsn1_ru_oauth_maybe_flush_rewrites()
+{
+    if (get_option('wp_smsn1_ru_rewrite_version') !== WP_SMSN1_RU_VERSION) {
+        flush_rewrite_rules(false);
+        update_option('wp_smsn1_ru_rewrite_version', WP_SMSN1_RU_VERSION);
+    }
+}
+add_action('init', 'wp_smsn1_ru_oauth_maybe_flush_rewrites', 99);
 
 /**
  * Старт входа: генерирует state и PKCE, уводит на провайдера.

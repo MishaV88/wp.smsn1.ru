@@ -94,6 +94,8 @@ function wp_smsn1_ru_create_pages_on_activation() {
 }
 // Регистрируем функцию создания страниц при активации плагина
 register_activation_hook(__FILE__, 'wp_smsn1_ru_create_pages_on_activation');
+// Правила перезаписи нужны для чистого redirect URL OAuth
+register_activation_hook(__FILE__, 'flush_rewrite_rules');
 
 
 // Инициализация плагина
