@@ -43,7 +43,13 @@ class WP_SMSN1_RU_Provider_VK implements WP_SMSN1_RU_Auth_Provider
      */
     public function get_scope()
     {
-        return (string) apply_filters('wp_smsn1_ru_vk_scope', '');
+        $scope = trim((string) get_option('wp_smsn1_ru_vk_scope', ''));
+
+        if ($scope === '') {
+            $scope = (string) apply_filters('wp_smsn1_ru_vk_scope', '');
+        }
+
+        return trim($scope);
     }
 
     public function get_authorize_url($state, $code_verifier, $redirect_uri)
@@ -126,6 +132,7 @@ class WP_SMSN1_RU_Provider_VK implements WP_SMSN1_RU_Auth_Provider
         $profile = array(
             'uid'   => $user_id,
             'email' => '',
+            'phone' => '',
             'name'  => '',
         );
 
@@ -227,6 +234,10 @@ class WP_SMSN1_RU_Provider_VK implements WP_SMSN1_RU_Auth_Provider
 
         if ($profile['email'] === '' && !empty($user['email']) && is_email($user['email'])) {
             $profile['email'] = $user['email'];
+        }
+
+        if ($profile['phone'] === '' && !empty($user['phone']) && is_string($user['phone'])) {
+            $profile['phone'] = $user['phone'];
         }
 
         return $profile;

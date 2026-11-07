@@ -117,6 +117,7 @@ function wp_smsn1_ru_register_settings() {
 	register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_vk_enabled', 'sanitize_text_field');
 	register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_vk_client_id', 'sanitize_text_field');
 	register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_vk_client_secret', 'sanitize_text_field');
+	register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_vk_scope', 'sanitize_text_field');
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_use_custom_login_form_url', 'sanitize_text_field');
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_use_custom_register_form_url', 'sanitize_text_field');
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_use_custom_login_redirect_url', 'sanitize_text_field');
@@ -154,6 +155,7 @@ function wp_smsn1_ru_register_settings() {
     add_settings_field('wp_smsn1_ru_vk_enabled', 'VK ID', 'wp_smsn1_ru_vk_enabled_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_oauth_section');
     add_settings_field('wp_smsn1_ru_vk_client_id', 'VK ID: ID приложения', 'wp_smsn1_ru_vk_client_id_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_oauth_section');
     add_settings_field('wp_smsn1_ru_vk_client_secret', 'VK ID: защищённый ключ', 'wp_smsn1_ru_vk_client_secret_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_oauth_section');
+    add_settings_field('wp_smsn1_ru_vk_scope', 'VK ID: доступы (scope)', 'wp_smsn1_ru_vk_scope_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_oauth_section');
     add_settings_field('wp_smsn1_ru_vk_redirect', 'VK ID: Redirect URI', 'wp_smsn1_ru_vk_redirect_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_oauth_section');
 
     add_settings_section('wp_smsn1_ru_redirects_section', 'Настройки ссылок и перенаправлений(редиректов)', null, 'wp-smsn1-ru-settings');
@@ -501,4 +503,12 @@ function wp_smsn1_ru_vk_redirect_callback() {
     $url = function_exists('wp_smsn1_ru_oauth_redirect_uri') ? wp_smsn1_ru_oauth_redirect_uri() : '';
     echo '<input type="text" readonly value="' . esc_attr($url) . '" class="large-text code" onclick="this.select();">';
     echo '<p class="description">Добавьте этот адрес в приложении VK ID как доверенный redirect URI — точно, вместе с https.</p>';
+}
+
+
+function wp_smsn1_ru_vk_scope_callback() {
+    echo '<input type="text" name="wp_smsn1_ru_vk_scope" value="' . esc_attr((string) get_option('wp_smsn1_ru_vk_scope')) . '" class="regular-text" placeholder="email phone">';
+    echo '<p class="description">Оставьте пустым, пока VK не одобрил доступы: по умолчанию приходит только имя и фамилия (vkid.personal_info). '
+        . 'Если в кабинете VK включены e-mail и телефон и профиль бизнеса подтверждён, укажите <code>email phone</code> — '
+        . 'тогда эти данные придут при входе. Неправильный scope ломает вход целиком (ошибка invalid_scope).</p>';
 }

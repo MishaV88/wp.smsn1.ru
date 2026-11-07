@@ -231,6 +231,10 @@ function wp_smsn1_ru_oauth_callback()
 
         update_user_meta($user_id, wp_smsn1_ru_oauth_meta_key($provider->get_id()), $profile['uid']);
 
+    if (!empty($profile['phone'])) {
+        update_user_meta($user_id, '_wp_smsn1_ru_vk_phone', sanitize_text_field($profile['phone']));
+    }
+
         wp_safe_redirect(add_query_arg('wp_smsn1_ru_linked', $provider->get_id(), admin_url('profile.php')));
         exit;
     }
@@ -242,6 +246,16 @@ function wp_smsn1_ru_oauth_callback()
         if (!empty($profile['email']) && email_exists($profile['email'])) {
             wp_safe_redirect(add_query_arg('wp_smsn1_ru_notice', 'email_exists', wp_login_url()));
             exit;
+        }
+
+        // Телефон, подтверждённый VK, тоже может принадлежать существующему аккаунту
+        if (!empty($profile['phone']) && function_exists('wp_smsn1_ru_get_user_by_phone')) {
+            $vk_phone = sanitize_my_phone_for_field($profile['phone']);
+
+            if ($vk_phone !== 'not_russian_num' && wp_smsn1_ru_get_user_by_phone($vk_phone)) {
+                wp_safe_redirect(add_query_arg('wp_smsn1_ru_notice', 'phone_exists', wp_login_url()));
+                exit;
+            }
         }
 
         $user_id = wp_smsn1_ru_oauth_create_user($provider, $profile);
@@ -384,6 +398,11 @@ function wp_smsn1_ru_oauth_login_message($message)
     if (isset($_GET['wp_smsn1_ru_notice']) && 'email_exists' === $_GET['wp_smsn1_ru_notice']) {
         $message .= '<p class="message">Аккаунт с таким e-mail уже существует. Войдите в него, '
             . 'а затем привяжите VK ID в профиле — мы не объединяем аккаунты автоматически.</p>';
+    }
+
+    if (isset($_GET['wp_smsn1_ru_notice']) && 'phone_exists' === $_GET['wp_smsn1_ru_notice']) {
+        $message .= '<p class="message">Аккаунт с таким номером телефона уже существует. Войдите в него, '
+            . 'а затем привяжите VK ID в профиле.</p>';
     }
 
     return $message;
