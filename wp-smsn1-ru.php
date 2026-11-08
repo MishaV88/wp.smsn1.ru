@@ -5,7 +5,7 @@
  * Plugin URI:  https://wp.smsn1.ru/
  * Author URI:  https://docs-group.ru/
  * Support URI: https://wp.smsn1.ru/контакты-службы-поддержки/
- * Version: 1.3.0
+ * Version: 1.4.0
  * Author: Vasilev Mikhail Y.
  * License:     GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 if (!defined('WP_SMSN1_RU_VERSION')) {
-    define('WP_SMSN1_RU_VERSION', '1.3.0');
+    define('WP_SMSN1_RU_VERSION', '1.4.0');
 }
 
 // Подключение необходимых файлов
@@ -24,7 +24,9 @@ require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-functions.php'; /
 require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-otp.php'; // OTP: генерация, лимит попыток, защита от SMS-бомбинга
 require_once plugin_dir_path(__FILE__) . 'includes/auth/interface-wp-smsn1-ru-auth-provider.php';
 require_once plugin_dir_path(__FILE__) . 'includes/auth/functions-pkce.php';
+require_once plugin_dir_path(__FILE__) . 'includes/auth/interface-wp-smsn1-ru-auth-provider-widget.php';
 require_once plugin_dir_path(__FILE__) . 'includes/auth/class-wp-smsn1-ru-provider-vk.php';
+require_once plugin_dir_path(__FILE__) . 'includes/auth/class-wp-smsn1-ru-provider-telegram.php';
 require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-oauth.php';
 require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-admin.php'; //Этот файл будет содержать код для добавления настроек плагина в административной панели.
 // Проверка работоспособности плагина и активирован ли WooCommerce
