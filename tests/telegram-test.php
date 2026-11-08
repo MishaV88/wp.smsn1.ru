@@ -45,6 +45,7 @@ function get_option($name, $default = false)
     return isset($options[$name]) ? $options[$name] : $default;
 }
 
+require dirname(__DIR__) . '/includes/auth/interface-wp-smsn1-ru-auth-provider-widget.php';
 require dirname(__DIR__) . '/includes/auth/class-wp-smsn1-ru-provider-telegram.php';
 
 $GLOBALS['tg_failures'] = 0;
