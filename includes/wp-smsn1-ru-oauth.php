@@ -29,6 +29,10 @@ function wp_smsn1_ru_oauth_providers()
         $providers['vk'] = new WP_SMSN1_RU_Provider_VK();
     }
 
+    if (class_exists('WP_SMSN1_RU_Provider_Telegram')) {
+        $providers['telegram'] = new WP_SMSN1_RU_Provider_Telegram();
+    }
+
     /**
      * Позволяет добавить провайдера (например, Telegram).
      *
@@ -69,6 +73,7 @@ function wp_smsn1_ru_oauth_redirect_uri()
 function wp_smsn1_ru_oauth_add_rewrite()
 {
     add_rewrite_rule('^wp-smsn1-ru-oauth/?$', 'index.php?wp_smsn1_ru_oauth_callback=1', 'top');
+    add_rewrite_rule('^wp-smsn1-ru-oauth/([a-z0-9_-]+)/?$', 'index.php?wp_smsn1_ru_oauth_widget=$matches[1]', 'top');
 }
 add_action('init', 'wp_smsn1_ru_oauth_add_rewrite', 5);
 
@@ -78,6 +83,7 @@ add_action('init', 'wp_smsn1_ru_oauth_add_rewrite', 5);
 function wp_smsn1_ru_oauth_query_vars($vars)
 {
     $vars[] = 'wp_smsn1_ru_oauth_callback';
+    $vars[] = 'wp_smsn1_ru_oauth_widget';
 
     return $vars;
 }
@@ -89,6 +95,14 @@ add_filter('query_vars', 'wp_smsn1_ru_oauth_query_vars');
  */
 function wp_smsn1_ru_oauth_maybe_callback()
 {
+    // Callback виджетного провайдера (Telegram): /wp-smsn1-ru-oauth/telegram/
+    $widget_provider = get_query_var('wp_smsn1_ru_oauth_widget');
+
+    if (!empty($widget_provider)) {
+        wp_smsn1_ru_oauth_widget_callback(sanitize_key($widget_provider));
+        return;
+    }
+
     $is_callback = (bool) get_query_var('wp_smsn1_ru_oauth_callback');
 
     // Запасной вариант: code+state пришли на любую страницу, а state нам известен.
@@ -126,6 +140,10 @@ function wp_smsn1_ru_oauth_start()
 
     $provider_id = sanitize_key(wp_unslash($_GET['wp_smsn1_ru_oauth']));
     $provider    = wp_smsn1_ru_oauth_get_provider($provider_id);
+
+    if ($provider instanceof WP_SMSN1_RU_Auth_Provider_Widget) {
+        wp_die(esc_html('Для этого сервиса вход выполняется через кнопку на форме.'), esc_html('Вход'), array('response' => 400));
+    }
 
     if (!$provider || !$provider->is_configured()) {
         wp_die(
@@ -372,6 +390,12 @@ function wp_smsn1_ru_oauth_buttons_html()
             continue;
         }
 
+        // Виджетные провайдеры (Telegram) рендерят свою кнопку через JS провайдера
+        if ($provider instanceof WP_SMSN1_RU_Auth_Provider_Widget) {
+            $buttons[] = $provider->get_button_html(home_url('/wp-smsn1-ru-oauth/' . $id . '/'));
+            continue;
+        }
+
         $url = add_query_arg('wp_smsn1_ru_oauth', $id, home_url('/'));
 
         $buttons[] = sprintf(
@@ -418,7 +442,7 @@ function wp_smsn1_ru_oauth_profile_section($user)
     $rows = array();
 
     foreach (wp_smsn1_ru_oauth_providers() as $id => $provider) {
-        if (!$provider->is_configured()) {
+        if (!$provider->is_configured() || $provider instanceof WP_SMSN1_RU_Auth_Provider_Widget) {
             continue;
         }
 
@@ -466,5 +490,75 @@ function wp_smsn1_ru_oauth_linked_notice()
 {
     if (!empty($_GET['wp_smsn1_ru_linked'])) {
         echo '<div class="notice notice-success is-dismissible"><p>Сервис привязан к аккаунту.</p></div>';
+    }
+}
+
+
+/**
+ * Callback виджетного провайдера: провайдер сам присылает подписанные данные.
+ *
+ * @param string $provider_id Идентификатор провайдера.
+ */
+function wp_smsn1_ru_oauth_widget_callback($provider_id)
+{
+    $provider = wp_smsn1_ru_oauth_get_provider($provider_id);
+
+    if (!$provider || !($provider instanceof WP_SMSN1_RU_Auth_Provider_Widget) || !$provider->is_configured()) {
+        wp_die(esc_html('Вход через этот сервис не настроен.'), esc_html('Вход недоступен'), array('response' => 400));
+    }
+
+    $profile = $provider->verify_callback($_GET);
+
+    if (is_wp_error($profile)) {
+        wp_die(
+            esc_html('Не удалось выполнить вход: ' . $profile->get_error_message()),
+            esc_html('Вход не выполнен'),
+            array('response' => 400)
+        );
+    }
+
+    $user_id = wp_smsn1_ru_oauth_find_user($provider->get_id(), $profile['uid']);
+    $created = false;
+
+    if (!$user_id) {
+        $user_id = wp_smsn1_ru_oauth_create_user($provider, $profile);
+
+        if (is_wp_error($user_id)) {
+            wp_die(esc_html('Не удалось создать аккаунт: ' . $user_id->get_error_message()), esc_html('Вход не выполнен'), array('response' => 500));
+        }
+
+        $created = true;
+    }
+
+    $user = get_user_by('id', $user_id);
+
+    if (!$user) {
+        wp_die(esc_html('Аккаунт не найден.'), esc_html('Вход не выполнен'), array('response' => 500));
+    }
+
+    wp_set_current_user($user_id);
+    wp_set_auth_cookie($user_id, true);
+    do_action('wp_login', $user->user_login, $user);
+
+    // Telegram не отдаёт e-mail — предлагаем добавить его в профиле
+    if ($created && $user->user_email === '') {
+        wp_safe_redirect(add_query_arg('wp_smsn1_ru_add_email', $provider->get_id(), admin_url('profile.php')));
+        exit;
+    }
+
+    wp_safe_redirect(home_url('/'));
+    exit;
+}
+
+/**
+ * Подсказка «добавьте e-mail» для аккаунтов из Telegram.
+ */
+add_action('admin_notices', 'wp_smsn1_ru_oauth_add_email_notice');
+function wp_smsn1_ru_oauth_add_email_notice()
+{
+    if (!empty($_GET['wp_smsn1_ru_add_email'])) {
+        echo '<div class="notice notice-warning"><p>Аккаунт создан через '
+            . esc_html(sanitize_text_field(wp_unslash($_GET['wp_smsn1_ru_add_email'])))
+            . ', у него нет e-mail. Укажите адрес ниже — он нужен для восстановления доступа.</p></div>';
     }
 }

@@ -55,6 +55,9 @@ jobs:
       - name: Run OTP logic tests
         run: php tests/otp-test.php
 
+      - name: Run Telegram signature tests
+        run: php tests/telegram-test.php
+
       - name: Build dist/wp-smsn1-ru.zip
         run: bash bin/build.sh
 

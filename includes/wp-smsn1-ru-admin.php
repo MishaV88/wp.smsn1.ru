@@ -118,6 +118,9 @@ function wp_smsn1_ru_register_settings() {
 	register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_vk_client_id', 'sanitize_text_field');
 	register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_vk_client_secret', 'sanitize_text_field');
 	register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_vk_scope', 'sanitize_text_field');
+	register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_telegram_enabled', 'sanitize_text_field');
+	register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_telegram_bot', 'sanitize_text_field');
+	register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_telegram_token', 'sanitize_text_field');
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_use_custom_login_form_url', 'sanitize_text_field');
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_use_custom_register_form_url', 'sanitize_text_field');
     register_setting('wp_smsn1_ru_settings_group', 'wp_smsn1_ru_use_custom_login_redirect_url', 'sanitize_text_field');
@@ -157,6 +160,10 @@ function wp_smsn1_ru_register_settings() {
     add_settings_field('wp_smsn1_ru_vk_client_secret', 'VK ID: защищённый ключ', 'wp_smsn1_ru_vk_client_secret_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_oauth_section');
     add_settings_field('wp_smsn1_ru_vk_scope', 'VK ID: доступы (scope)', 'wp_smsn1_ru_vk_scope_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_oauth_section');
     add_settings_field('wp_smsn1_ru_vk_redirect', 'VK ID: Redirect URI', 'wp_smsn1_ru_vk_redirect_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_oauth_section');
+    add_settings_field('wp_smsn1_ru_telegram_enabled', 'Telegram', 'wp_smsn1_ru_telegram_enabled_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_oauth_section');
+    add_settings_field('wp_smsn1_ru_telegram_bot', 'Telegram: username бота', 'wp_smsn1_ru_telegram_bot_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_oauth_section');
+    add_settings_field('wp_smsn1_ru_telegram_token', 'Telegram: токен бота', 'wp_smsn1_ru_telegram_token_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_oauth_section');
+    add_settings_field('wp_smsn1_ru_telegram_domain', 'Telegram: домен для /setdomain', 'wp_smsn1_ru_telegram_domain_callback', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_oauth_section');
 
     add_settings_section('wp_smsn1_ru_redirects_section', 'Настройки ссылок и перенаправлений(редиректов)', null, 'wp-smsn1-ru-settings');
     add_settings_field('wp_smsn1_ru_use_custom_login_form_url', 'Ссылка на страницу с формой входа на сайт.', 'wp_smsn1_ru_use_custom_login_form_url', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_redirects_section');
@@ -511,4 +518,26 @@ function wp_smsn1_ru_vk_scope_callback() {
     echo '<p class="description">Оставьте пустым, пока VK не одобрил доступы: по умолчанию приходит только имя и фамилия (vkid.personal_info). '
         . 'Если в кабинете VK включены e-mail и телефон и профиль бизнеса подтверждён, укажите <code>email phone</code> — '
         . 'тогда эти данные придут при входе. Неправильный scope ломает вход целиком (ошибка invalid_scope).</p>';
+}
+
+
+function wp_smsn1_ru_telegram_enabled_callback() {
+    $checked = get_option('wp_smsn1_ru_telegram_enabled') === 'yes' ? 'checked' : '';
+    echo '<input type="checkbox" name="wp_smsn1_ru_telegram_enabled" value="yes" ' . $checked . ' /> Показывать «Войти через Telegram»';
+}
+
+function wp_smsn1_ru_telegram_bot_callback() {
+    echo '<input type="text" name="wp_smsn1_ru_telegram_bot" value="' . esc_attr((string) get_option('wp_smsn1_ru_telegram_bot')) . '" class="regular-text" placeholder="wp_smsn1_ru_bot">';
+    echo '<p class="description">Username бота без символа @.</p>';
+}
+
+function wp_smsn1_ru_telegram_token_callback() {
+    echo '<input type="password" name="wp_smsn1_ru_telegram_token" value="' . esc_attr((string) get_option('wp_smsn1_ru_telegram_token')) . '" class="regular-text" autocomplete="new-password">';
+    echo '<p class="description">Токен от @BotFather. Если он где-то засветился — перевыпустите командой /revoke и впишите новый.</p>';
+}
+
+function wp_smsn1_ru_telegram_domain_callback() {
+    $host = wp_parse_url(home_url('/'), PHP_URL_HOST);
+    echo '<input type="text" readonly value="' . esc_attr((string) $host) . '" class="regular-text code" onclick="this.select();">';
+    echo '<p class="description">В @BotFather выполните /setdomain и отправьте этот домен — иначе виджет Telegram не пустит на сайт.</p>';
 }
