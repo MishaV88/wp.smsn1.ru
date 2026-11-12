@@ -81,3 +81,14 @@ label[for="sms_code"], #sms_code {
 .wp-smsn1-ru-oauth-button:hover {
     background: #0060cc;
 }
+
+
+.wp-smsn1-ru-oauth-notice {
+    margin: 0 0 15px;
+    padding: 10px 12px;
+    border-left: 4px solid #dba617;
+    background: #fcf9e8;
+    color: #1d2327;
+    font-size: 14px;
+    line-height: 1.45;
+}
