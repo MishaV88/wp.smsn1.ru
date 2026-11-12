@@ -15,6 +15,6 @@
 		<input type="hidden" id="wp_smsn1_ru_use_custom_login_redirect_url" name="wp_smsn1_ru_use_custom_login_redirect_url" value="<?= get_option('wp_smsn1_ru_use_custom_login_redirect_url');  ?>" />
         <button type="submit">Войти</button> <button type="button" class="grey" onclick="location.href='<?= get_option('wp_smsn1_ru_use_custom_register_form_url');  ?>';" >Зарегестрироваться</button>
     </form>
-    <div id="wp-smsn1-ru-message"></div>
+    <div id="wp-smsn1-ru-message" class="wp-smsn1-ru-message" role="status" aria-live="polite"></div>
 	<p class="privacy-policy-url" ><a href="/privacy-policy/" target="_blank">Продолжая, Вы соглашаетесь с политикой обработки персональных данных.</a></p>
 </div>

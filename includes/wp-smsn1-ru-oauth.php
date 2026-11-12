@@ -462,7 +462,7 @@ function wp_smsn1_ru_oauth_notice_html()
         return '';
     }
 
-    return '<div class="wp-smsn1-ru-oauth-notice">' . esc_html($text) . '</div>';
+    return '<div class="wp-smsn1-ru-notice wp-smsn1-ru-notice--warning" role="status">' . esc_html($text) . '</div>';
 }
 
 /**

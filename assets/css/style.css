@@ -83,12 +83,38 @@ label[for="sms_code"], #sms_code {
 }
 
 
-.wp-smsn1-ru-oauth-notice {
-    margin: 0 0 15px;
+.wp-smsn1-ru-notice {
+    display: block;
+    margin: 0 0 12px;
     padding: 10px 12px;
-    border-left: 4px solid #dba617;
-    background: #fcf9e8;
+    border-left: 4px solid #2271b1;
+    border-radius: 4px;
+    background: #f0f6fc;
     color: #1d2327;
     font-size: 14px;
-    line-height: 1.45;
+    line-height: 1.5;
+}
+
+.wp-smsn1-ru-notice--success {
+    border-left-color: #00a32a;
+    background: #edfaef;
+}
+
+.wp-smsn1-ru-notice--warning {
+    border-left-color: #dba617;
+    background: #fcf9e8;
+}
+
+.wp-smsn1-ru-notice--error {
+    border-left-color: #d63638;
+    background: #fcf0f1;
+}
+
+.wp-smsn1-ru-notice a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.wp-smsn1-ru-message:empty {
+    display: none;
 }
