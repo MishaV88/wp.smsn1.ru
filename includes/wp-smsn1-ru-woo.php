@@ -28,7 +28,7 @@ function wp_smsn1_ru_add_custom_phone_field($checkout) {
 
 	// Кнопка для отправки SMS-кода
 	echo '<button type="button" id="send-sms-code-checkout" class="button">' . __('Отправить код') . '</button>';
-	echo '<div id="wp-smsn1-ru-message"></div>';
+	echo '<div id="wp-smsn1-ru-message" class="wp-smsn1-ru-message" role="status" aria-live="polite"></div>';
 	echo '</div>';
 }
 

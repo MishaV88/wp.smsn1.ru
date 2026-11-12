@@ -21,6 +21,16 @@ jQuery(document).ready(function($) {
 
 		return cleaned;
 	}
+    // Единый вывод уведомлений: info | success | warning | error
+    function showNotice(message, type) {
+        var $box = $('#wp-smsn1-ru-message');
+        if (!$box.length) {
+            return;
+        }
+        type = type || 'info';
+        $box.html('<div class="wp-smsn1-ru-notice wp-smsn1-ru-notice--' + type + '" role="status">' + message + '</div>');
+    }
+
     // Функция для обновления текста кнопки
     function updateButtonText(seconds) {
         $('#send-sms-code').text(`Отправить код (${seconds} сек)`);
@@ -70,18 +80,18 @@ jQuery(document).ready(function($) {
             },
             success: function(response) {	
 				if (response.success) {			
-					$('#wp-smsn1-ru-message').html(response.data);
+					showNotice(response.data, 'success');
 					$('label[for=sms_code], #sms_code').css({ "display":"block", "font-size":"14px"});
 					$('.wp-smsn1-ru-form button[type="submit"]').css({ "background-color": "#0073aa"});
 					startCountdown();   // Запускаем таймер 
 				}
 				else {
-					$('#wp-smsn1-ru-message').html(response.data);
+					showNotice(response.data, 'error');
 				}
             },
             error: function(xhr) {
                 var msg = (xhr && xhr.responseJSON && xhr.responseJSON.data) ? xhr.responseJSON.data : 'Ошибка при отправке запроса.';
-                $('#wp-smsn1-ru-message').html(msg);
+                showNotice(msg, 'error');
             }
         });
     });
@@ -93,11 +103,11 @@ jQuery(document).ready(function($) {
         var pwd  = $('#user_password').val() || '';
         var pwd2 = $('#user_password_confirm').val() || '';
         if (pwd2 !== '' && pwd !== pwd2) {
-            $('#wp-smsn1-ru-message').html('Пароли не совпадают.');
+            showNotice('Пароли не совпадают.', 'error');
             return;
         }
         if($('#sms_code').css('display') === 'none') {	//Проверяем код ввобще введен
-			$('#wp-smsn1-ru-message').html('Получите и введите код из СМС.');
+			showNotice('Получите и введите код из СМС.', 'warning');
 			return;
 		}	
         var phoneNumber = $('#phone_number').val();
@@ -122,12 +132,12 @@ jQuery(document).ready(function($) {
             success: function(response) {
                 if (response.success) {
                     // Успешная авторизация
-                    $('#wp-smsn1-ru-message').html(response.data);
+                    showNotice(response.data, 'success');
                     // Перенаправление на другую страницу (опционально)
                     window.location.href = '/' + wp_smsn1_ru_use_custom_login_redirect_url; // Замените на нужный URL
                 } else {
                     // Ошибка авторизации
-                    $('#wp-smsn1-ru-message').html(response.data);
+                    showNotice(response.data, 'error');
                 }
             },
             error: function(xhr) {
@@ -159,12 +169,12 @@ jQuery(document).ready(function($) {
 				},
 			   success: function(response) {	
 					if (response.success) {			
-						$('#wp-smsn1-ru-message').html(response.data);
+						showNotice(response.data, 'success');
 						$('label[for=sms_code], #sms_code').css({ "display": "block"});					
 						startCountdown();   // Запускаем таймер 
 					}
 					else {
-						$('#wp-smsn1-ru-message').html(response.data);
+						showNotice(response.data, 'error');
 					}
 				},
 				error: function(xhr) {
@@ -194,7 +204,7 @@ jQuery(document).ready(function($) {
                     if (response.success) {
                         if (response.data.exists) {
                             // Пользователь существует, выводим сообщение
-                            $('#wp-smsn1-ru-message').html('Пользователь с таким номером телефона уже существует. <a href="'+response.data.res_url+'">Войдите в систему</a>.');
+                            showNotice('Пользователь с таким номером телефона уже существует. <a href="' + response.data.res_url + '">Войдите в систему</a>.', 'warning');
                             $('#createaccount').prop('checked', false); // Снимаем выбор чекбокса
                         }
                     } else {
