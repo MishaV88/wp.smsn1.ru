@@ -5,7 +5,7 @@
  * Plugin URI:  https://wp.smsn1.ru/
  * Author URI:  https://docs-group.ru/
  * Support URI: https://wp.smsn1.ru/контакты-службы-поддержки/
- * Version: 1.4.3
+ * Version: 1.5.0
  * Author: Vasilev Mikhail Y.
  * License:     GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 if (!defined('WP_SMSN1_RU_VERSION')) {
-    define('WP_SMSN1_RU_VERSION', '1.4.3');
+    define('WP_SMSN1_RU_VERSION', '1.5.0');
 }
 
 // Подключение необходимых файлов
@@ -201,6 +201,28 @@ function sanitize_my_phone_for_field($phone_number) {
 	return $phone_number;	
 }	
 /**
+ * Адрес страницы по значению опции: принимает slug или абсолютный URL.
+ *
+ * @param string $option_name Имя опции.
+ * @param string $default_slug Значение по умолчанию.
+ * @return string
+ */
+function wp_smsn1_ru_page_url($option_name, $default_slug)
+{
+    $value = (string) get_option($option_name, $default_slug);
+
+    if ($value === '') {
+        $value = $default_slug;
+    }
+
+    if (preg_match('#^https?://#i', $value)) {
+        return $value;
+    }
+
+    return home_url('/' . trim($value, '/') . '/');
+}
+
+/**
  * Режим входа: 'otp' — только код из СМС, 'password_otp' — пароль + код (2FA).
  */
 function wp_smsn1_ru_auth_mode() {
@@ -223,7 +245,7 @@ function handle_send_sms_code() {
 
     if ($type_of_form === 'login' && !wp_smsn1_ru_get_user_by_phone($phone_number)) {
         $register_url = home_url('/') . get_option('wp_smsn1_ru_use_custom_register_form_url', 'registation-by-wp-smsn1-ru');
-        wp_send_json_error('Телефонный номер не найден, просьба <a href="' . esc_url($register_url) . '">зарегестрироваться(30 секунд)</a><style>.wp-smsn1-ru-form button[type="submit"]{background-color: #bbb;} .wp-smsn1-ru-form button[type="submit"] ~ button{    background-color: #0073aa; } </style>');
+        wp_send_json_error('Номер не найден. <a href="' . esc_url($register_url) . '">Зарегистрируйтесь</a> — это займёт около 30 секунд.');
     }
 
     // Защита от SMS-бомбинга: пауза между отправками и часовые лимиты на номер и IP
