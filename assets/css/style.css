@@ -1,97 +1,208 @@
+/**
+ * WP.SMSn1.RU — формы входа и регистрации.
+ *
+ * Цвета вынесены в CSS-переменные, чтобы тему можно было переопределить без правки файла:
+ *
+ * .wp-smsn1-ru-form {
+ *     --wp-smsn1-ru-accent: #2271b1;
+ *     --wp-smsn1-ru-radius: 6px;
+ * }
+ */
+
 .wp-smsn1-ru-form {
-    max-width: 400px;
-    margin: 10px auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
+    --wp-smsn1-ru-accent: #2271b1;
+    --wp-smsn1-ru-accent-hover: #135e96;
+    --wp-smsn1-ru-text: #1d2327;
+    --wp-smsn1-ru-muted: #646970;
+    --wp-smsn1-ru-border: #dcdcde;
+    --wp-smsn1-ru-bg: #fff;
+    --wp-smsn1-ru-radius: 6px;
 
-.wp-smsn1-ru-form label {
-    display: block;
-    margin-bottom: 10px;
-}
-	
-.wp-smsn1-ru-form input {
+    box-sizing: border-box;
     width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
+    max-width: 420px;
+    margin: 1rem auto;
+    padding: 1.5rem;
+    border: 1px solid var(--wp-smsn1-ru-border);
+    border-radius: var(--wp-smsn1-ru-radius);
+    background: var(--wp-smsn1-ru-bg);
+    color: var(--wp-smsn1-ru-text);
+    font-size: 1rem;
+    line-height: 1.5;
 }
 
-.wp-smsn1-ru-form button {
-    padding: 10px 15px;
-    background-color: #0073aa;
-    color: #fff;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-}
-.wp-smsn1-ru-form .grey {
-
-    background-color: #bbb;
-
-}
-.wp-smsn1-ru-form button[type="submit"] {
-	background-color: #bbb;
-}
-.wp-smsn1-ru-form button:hover {
-    background-color: #005177;
+.wp-smsn1-ru-form *,
+.wp-smsn1-ru-form *::before,
+.wp-smsn1-ru-form *::after {
+    box-sizing: border-box;
 }
 
-#wp-smsn1-ru-message {
-    margin-top: 10px;
-    color: #ff0000;
-}
-label[for="sms_code"], #sms_code {
-	display: none;
-	/* font-size: 0px;*/
-}	
-#send-sms-code {
-	display: list-item;
-	margin-bottom: 5px;
-}	
-.wp-smsn1-ru-form p.privacy-policy-url {
-	text-align: center;
-	margin-bottom: 0px;
-}	
-.wp-smsn1-ru-form p.privacy-policy-url > a{
-	color: #0073aa;
-    text-decoration: underline;
-}	
-
-
-.wp-smsn1-ru-oauth {
-    margin: 0 0 15px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #eee;
+.wp-smsn1-ru-form__title {
+    margin: 0 0 1rem;
+    font-size: 1.25rem;
+    line-height: 1.3;
 }
 
-.wp-smsn1-ru-oauth-button {
+.wp-smsn1-ru-form__intro {
+    margin: 0 0 1rem;
+    color: var(--wp-smsn1-ru-muted);
+    font-size: 0.9rem;
+}
+
+/* Поля */
+
+.wp-smsn1-ru-field {
+    margin-bottom: 1rem;
+}
+
+.wp-smsn1-ru-field label {
     display: block;
-    padding: 10px 15px;
-    margin-bottom: 8px;
+    margin-bottom: 0.35rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.wp-smsn1-ru-form input[type="text"],
+.wp-smsn1-ru-form input[type="tel"],
+.wp-smsn1-ru-form input[type="email"],
+.wp-smsn1-ru-form input[type="password"] {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--wp-smsn1-ru-border);
+    border-radius: var(--wp-smsn1-ru-radius);
+    background: var(--wp-smsn1-ru-bg);
+    color: inherit;
+    font: inherit;
+    line-height: 1.4;
+}
+
+.wp-smsn1-ru-form input:focus {
+    outline: 2px solid var(--wp-smsn1-ru-accent);
+    outline-offset: 1px;
+    border-color: var(--wp-smsn1-ru-accent);
+}
+
+.wp-smsn1-ru-form input::placeholder {
+    color: var(--wp-smsn1-ru-muted);
+    opacity: 1;
+}
+
+/* Поле кода скрыто до отправки СМС */
+.wp-smsn1-ru-field--code {
+    display: none;
+}
+
+/* Кнопки */
+
+.wp-smsn1-ru-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 1.25rem 0 0;
+}
+
+.wp-smsn1-ru-actions > * {
+    flex: 1 1 140px;
+}
+
+.wp-smsn1-ru-button,
+.wp-smsn1-ru-form button {
+    display: inline-block;
+    padding: 0.6rem 1rem;
+    border: 1px solid transparent;
+    border-radius: var(--wp-smsn1-ru-radius);
+    background: var(--wp-smsn1-ru-accent);
+    color: #fff;
+    font: inherit;
+    line-height: 1.4;
     text-align: center;
     text-decoration: none;
-    border-radius: 4px;
-    background: #0077ff;
-    color: #fff !important;
+    cursor: pointer;
+    transition: background-color 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
 }
 
-.wp-smsn1-ru-oauth-button:hover {
-    background: #0060cc;
+.wp-smsn1-ru-button:hover,
+.wp-smsn1-ru-form button:hover {
+    background: var(--wp-smsn1-ru-accent-hover);
+    color: #fff;
 }
 
+.wp-smsn1-ru-button:focus-visible,
+.wp-smsn1-ru-form button:focus-visible {
+    outline: 2px solid var(--wp-smsn1-ru-accent);
+    outline-offset: 2px;
+}
+
+.wp-smsn1-ru-button--secondary,
+.wp-smsn1-ru-form button.is-secondary {
+    border-color: var(--wp-smsn1-ru-border);
+    background: transparent;
+    color: var(--wp-smsn1-ru-text);
+}
+
+.wp-smsn1-ru-button--secondary:hover,
+.wp-smsn1-ru-form button.is-secondary:hover {
+    border-color: var(--wp-smsn1-ru-accent);
+    background: transparent;
+    color: var(--wp-smsn1-ru-accent);
+}
+
+.wp-smsn1-ru-form button:disabled,
+.wp-smsn1-ru-button[aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* Основная кнопка «неактивна», пока код не отправлен */
+.wp-smsn1-ru-form button[type="submit"] {
+    opacity: 0.55;
+}
+
+.wp-smsn1-ru-form button[type="submit"].is-ready {
+    opacity: 1;
+}
+
+/* Ссылки и служебный текст */
+
+.wp-smsn1-ru-links {
+    margin: 0.75rem 0 0;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.wp-smsn1-ru-links a {
+    color: var(--wp-smsn1-ru-accent);
+    text-decoration: underline;
+}
+
+.wp-smsn1-ru-privacy {
+    margin: 1rem 0 0;
+    color: var(--wp-smsn1-ru-muted);
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.wp-smsn1-ru-privacy a {
+    color: inherit;
+}
+
+/* Уведомления */
+
+.wp-smsn1-ru-message:empty {
+    display: none;
+}
 
 .wp-smsn1-ru-notice {
     display: block;
-    margin: 0 0 12px;
-    padding: 10px 12px;
-    border-left: 4px solid #2271b1;
+    margin: 0.75rem 0 0;
+    padding: 0.65rem 0.8rem;
+    border-left: 4px solid var(--wp-smsn1-ru-accent, #2271b1);
     border-radius: 4px;
     background: #f0f6fc;
     color: #1d2327;
-    font-size: 14px;
+    font-size: 0.9rem;
     line-height: 1.5;
 }
 
@@ -115,6 +226,57 @@ label[for="sms_code"], #sms_code {
     text-decoration: underline;
 }
 
-.wp-smsn1-ru-message:empty {
-    display: none;
+/* Кнопки соцсетей */
+
+.wp-smsn1-ru-oauth {
+    margin: 0 0 1rem;
+}
+
+.wp-smsn1-ru-oauth + .wp-smsn1-ru-oauth {
+    margin-top: -0.5rem;
+}
+
+.wp-smsn1-ru-oauth-button {
+    display: block;
+    margin-bottom: 0.5rem;
+    padding: 0.6rem 1rem;
+    border-radius: var(--wp-smsn1-ru-radius, 6px);
+    background: var(--wp-smsn1-ru-accent, #2271b1);
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+}
+
+.wp-smsn1-ru-oauth-button:hover {
+    background: var(--wp-smsn1-ru-accent-hover, #135e96);
+    color: #fff;
+}
+
+.wp-smsn1-ru-oauth-telegram iframe {
+    display: block;
+    margin: 0 auto;
+}
+
+/* Мобильные */
+
+@media (max-width: 480px) {
+    .wp-smsn1-ru-form {
+        margin: 0.75rem auto;
+        padding: 1rem;
+        border-radius: 4px;
+    }
+
+    .wp-smsn1-ru-actions > * {
+        flex-basis: 100%;
+    }
+}
+
+/* WooCommerce: блок подтверждения на checkout */
+
+#wp_smsn1_ru_custom_phone_field {
+    margin: 1rem 0;
+}
+
+#wp_smsn1_ru_custom_phone_field .form-row {
+    margin-bottom: 0.75rem;
 }

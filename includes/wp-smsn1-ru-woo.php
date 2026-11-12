@@ -112,11 +112,11 @@ function wp_smsn1_ru_phone_verification_shortcode() {
         <h3><?php _e('Подтверждение номера телефона'); ?></h3>
         <p class="form-row form-row-wide">
             <label for="custom_phone"><?php _e('Номер телефона'); ?> <span class="required">*</span></label>
-            <input type="text" class="input-text" name="custom_phone" id="custom_phone" placeholder="9991234567" />
+            <input type="tel" class="input-text" name="custom_phone" id="custom_phone" autocomplete="tel" placeholder="+7 999 123-45-67" />
         </p>
-        <p class="form-row form-row-wide" >
-            <label  for="sms_code"><?php _e('Код подтверждения'); ?> <span class="required">*</span></label>
-            <input type="text" class="input-text" name="sms_code" id="sms_code" inputmode="numeric" autocomplete="one-time-code" maxlength="5" placeholder="<?php esc_attr_e('Введите код из СМС'); ?>" />
+        <p class="form-row form-row-wide wp-smsn1-ru-field--code">
+            <label for="sms_code"><?php esc_html_e('Код подтверждения'); ?> <span class="required">*</span></label>
+            <input type="text" class="input-text" name="sms_code" id="sms_code" inputmode="numeric" autocomplete="one-time-code" maxlength="5" placeholder="<?php esc_attr_e('Код из СМС'); ?>" />
         </p>
         <button type="button" id="send-sms-code-checkout" class="button"><?php _e('Отправить код'); ?></button>
     </div>

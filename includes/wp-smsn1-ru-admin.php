@@ -168,7 +168,7 @@ function wp_smsn1_ru_register_settings() {
     add_settings_section('wp_smsn1_ru_redirects_section', 'Настройки ссылок и перенаправлений(редиректов)', null, 'wp-smsn1-ru-settings');
     add_settings_field('wp_smsn1_ru_use_custom_login_form_url', 'Ссылка на страницу с формой входа на сайт.', 'wp_smsn1_ru_use_custom_login_form_url', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_redirects_section');
     add_settings_field('wp_smsn1_ru_use_custom_register_form_url', 'Ссылка на страницу с формой регистрации.', 'wp_smsn1_ru_use_custom_register_form_url', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_redirects_section');
-    add_settings_field('wp_smsn1_ru_use_custom_login_redirect_url', 'На какую страницу перенапрвлять пользователя, после успешной авторизации или регистрации.', 'wp_smsn1_ru_use_custom_login_redirect_url', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_redirects_section');
+    add_settings_field('wp_smsn1_ru_use_custom_login_redirect_url', 'На какую страницу перенаправлять пользователя, после успешной авторизации или регистрации.', 'wp_smsn1_ru_use_custom_login_redirect_url', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_redirects_section');
     add_settings_field('wp_smsn1_ru_logout_redirect_url', 'Страница перенаправления после выхода из аккаунта', 'wp_smsn1_ru_logout_redirect_url', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_redirects_section');
     add_settings_field('wp_smsn1_ru_use_custom_login_form_redirect', 'Включить редирект с стандартной страницы входа и регистрации(wp-login.php)*', 'wp_smsn1_ru_use_custom_login_form_redirect', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_redirects_section');
     add_settings_field('wp_smsn1_ru_use_custom_login_form_redirect_url', 'Куда редирект:', 'wp_smsn1_ru_use_custom_login_form_redirect_url', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_redirects_section');
@@ -325,14 +325,14 @@ function wp_smsn1_ru_check_balance_notice() {
     if ($balance < 10 && $balance != "Проблема с соединением") {
         ?>
         <div class="notice notice-error is-dismissible">
-            <p>Ваш баланс в сервисе smsn1.ru составляет менее 10 рублей. Используются стандартные формы региcтрации и авторизации. <a href="https://wp.smsn1.ru/%d0%ba%d0%be%d0%bd%d1%82%d0%b0%d0%ba%d1%82%d1%8b-%d1%81%d0%bb%d1%83%d0%b6%d0%b1%d1%8b-%d0%bf%d0%be%d0%b4%d0%b4%d0%b5%d1%80%d0%b6%d0%ba%d0%b8/" target="_blank">Пожалуйста, пополните баланс.</a></p>
+            <p>Ваш баланс в сервисе smsn1.ru составляет менее 10 рублей. Используются стандартные формы регистрации и авторизации. <a href="https://wp.smsn1.ru/%d0%ba%d0%be%d0%bd%d1%82%d0%b0%d0%ba%d1%82%d1%8b-%d1%81%d0%bb%d1%83%d0%b6%d0%b1%d1%8b-%d0%bf%d0%be%d0%b4%d0%b4%d0%b5%d1%80%d0%b6%d0%ba%d0%b8/" target="_blank">Пожалуйста, пополните баланс.</a></p>
         </div>
         <?php
     }
 	if($balance == "Проблема с соединением") {
         ?>
         <div class="notice notice-error is-dismissible">
-            <p>Ошибка подключения к сервису smsn1.ru. Используются стандартные формы регситрации и авторизации. <a href="/wp-admin/admin.php?page=wp-smsn1-ru-settings">Пожалуйста проверьте Логин и API</a></p>
+            <p>Ошибка подключения к сервису smsn1.ru. Используются стандартные формы регистрации и авторизации. <a href="/wp-admin/admin.php?page=wp-smsn1-ru-settings">Пожалуйста проверьте Логин и API</a></p>
         </div>
         <?php		
 	}	
