@@ -5,7 +5,7 @@
  * Plugin URI:  https://wp.smsn1.ru/
  * Author URI:  https://docs-group.ru/
  * Support URI: https://wp.smsn1.ru/контакты-службы-поддержки/
- * Version: 1.4.0
+ * Version: 1.4.1
  * Author: Vasilev Mikhail Y.
  * License:     GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 if (!defined('WP_SMSN1_RU_VERSION')) {
-    define('WP_SMSN1_RU_VERSION', '1.4.0');
+    define('WP_SMSN1_RU_VERSION', '1.4.1');
 }
 
 // Подключение необходимых файлов
@@ -150,6 +150,10 @@ function wp_smsn1_ru_scripts() {
 // Шорткод для формы авторизации
 function wp_smsn1_ru_login_form_shortcode() {
     ob_start();
+
+    if (function_exists('wp_smsn1_ru_oauth_notice_html')) {
+        echo wp_smsn1_ru_oauth_notice_html();
+    }
 	$balance = wp_smsn1_ru_get_balance();
 	if (is_user_logged_in()) 
 		include wp_smsn1_ru_locate_template('exit-form.php');
@@ -168,6 +172,10 @@ function wp_smsn1_ru_login_form_shortcode() {
 // Шорткод для формы регистрации
 function wp_smsn1_ru_register_form_shortcode() {
     ob_start();
+
+    if (function_exists('wp_smsn1_ru_oauth_notice_html')) {
+        echo wp_smsn1_ru_oauth_notice_html();
+    }
 	$balance = wp_smsn1_ru_get_balance();
 	if (is_user_logged_in()) 
 		include plugin_dir_path(__FILE__) . 'templates/exit-form.php';

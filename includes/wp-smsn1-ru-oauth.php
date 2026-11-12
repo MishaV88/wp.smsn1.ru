@@ -262,7 +262,7 @@ function wp_smsn1_ru_oauth_callback()
     if (!$user_id) {
         // Автомерж по e-mail запрещён: предлагаем войти в аккаунт и привязать вручную
         if (!empty($profile['email']) && email_exists($profile['email'])) {
-            wp_safe_redirect(add_query_arg('wp_smsn1_ru_notice', 'email_exists', wp_login_url()));
+            wp_safe_redirect(add_query_arg('wp_smsn1_ru_notice', 'email_exists', wp_smsn1_ru_oauth_login_url()));
             exit;
         }
 
@@ -271,7 +271,7 @@ function wp_smsn1_ru_oauth_callback()
             $vk_phone = sanitize_my_phone_for_field($profile['phone']);
 
             if ($vk_phone !== 'not_russian_num' && wp_smsn1_ru_get_user_by_phone($vk_phone)) {
-                wp_safe_redirect(add_query_arg('wp_smsn1_ru_notice', 'phone_exists', wp_login_url()));
+                wp_safe_redirect(add_query_arg('wp_smsn1_ru_notice', 'phone_exists', wp_smsn1_ru_oauth_login_url()));
                 exit;
             }
         }
@@ -414,19 +414,69 @@ function wp_smsn1_ru_oauth_buttons_html()
 }
 
 /**
+ * Адрес формы входа плагина: именно туда ведём с сообщением о найденном аккаунте.
+ *
+ * @return string
+ */
+function wp_smsn1_ru_oauth_login_url()
+{
+    $slug = (string) get_option('wp_smsn1_ru_use_custom_login_form_url', 'login-by-wp-smsn1-ru');
+
+    if ($slug !== '' && get_page_by_path($slug)) {
+        return home_url('/' . trim($slug, '/') . '/');
+    }
+
+    return wp_login_url();
+}
+
+/**
+ * Текст уведомления по коду.
+ *
+ * @param string $code Код из query-параметра.
+ * @return string
+ */
+function wp_smsn1_ru_oauth_notice_text($code)
+{
+    $messages = array(
+        'email_exists' => 'Аккаунт с таким e-mail уже существует. Войдите в него, а затем привяжите VK ID в профиле — мы не объединяем аккаунты автоматически.',
+        'phone_exists' => 'Аккаунт с таким номером телефона уже существует. Войдите в него, а затем привяжите VK ID в профиле.',
+    );
+
+    return isset($messages[$code]) ? $messages[$code] : '';
+}
+
+/**
+ * HTML-блок уведомления для формы входа.
+ *
+ * @return string
+ */
+function wp_smsn1_ru_oauth_notice_html()
+{
+    if (empty($_GET['wp_smsn1_ru_notice'])) {
+        return '';
+    }
+
+    $text = wp_smsn1_ru_oauth_notice_text(sanitize_key(wp_unslash($_GET['wp_smsn1_ru_notice'])));
+
+    if ($text === '') {
+        return '';
+    }
+
+    return '<div class="wp-smsn1-ru-oauth-notice">' . esc_html($text) . '</div>';
+}
+
+/**
  * Сообщение на wp-login.php, если e-mail уже занят.
  */
 add_filter('login_message', 'wp_smsn1_ru_oauth_login_message');
 function wp_smsn1_ru_oauth_login_message($message)
 {
-    if (isset($_GET['wp_smsn1_ru_notice']) && 'email_exists' === $_GET['wp_smsn1_ru_notice']) {
-        $message .= '<p class="message">Аккаунт с таким e-mail уже существует. Войдите в него, '
-            . 'а затем привяжите VK ID в профиле — мы не объединяем аккаунты автоматически.</p>';
-    }
+    if (!empty($_GET['wp_smsn1_ru_notice'])) {
+        $text = wp_smsn1_ru_oauth_notice_text(sanitize_key(wp_unslash($_GET['wp_smsn1_ru_notice'])));
 
-    if (isset($_GET['wp_smsn1_ru_notice']) && 'phone_exists' === $_GET['wp_smsn1_ru_notice']) {
-        $message .= '<p class="message">Аккаунт с таким номером телефона уже существует. Войдите в него, '
-            . 'а затем привяжите VK ID в профиле.</p>';
+        if ($text !== '') {
+            $message .= '<p class="message">' . esc_html($text) . '</p>';
+        }
     }
 
     return $message;
