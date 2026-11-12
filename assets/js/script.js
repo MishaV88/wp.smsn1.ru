@@ -142,7 +142,7 @@ jQuery(document).ready(function($) {
             },
             error: function(xhr) {
                 var msg = (xhr && xhr.responseJSON && xhr.responseJSON.data) ? xhr.responseJSON.data : 'Ошибка при отправке запроса.';
-                $('#wp-smsn1-ru-message').html(msg);
+                showNotice(msg, 'error');
             }
         });
     });
@@ -179,7 +179,7 @@ jQuery(document).ready(function($) {
 				},
 				error: function(xhr) {
                 var msg = (xhr && xhr.responseJSON && xhr.responseJSON.data) ? xhr.responseJSON.data : 'Ошибка при отправке запроса.';
-                $('#wp-smsn1-ru-message').html(msg);
+                showNotice(msg, 'error');
             }
 			});
 		});
