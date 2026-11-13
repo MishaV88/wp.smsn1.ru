@@ -5,7 +5,7 @@
  * Plugin URI:  https://wp.smsn1.ru/
  * Author URI:  https://docs-group.ru/
  * Support URI: https://wp.smsn1.ru/контакты-службы-поддержки/
- * Version: 1.7.2
+ * Version: 1.8.0
  * Author: Vasilev Mikhail Y.
  * License:     GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 if (!defined('WP_SMSN1_RU_VERSION')) {
-    define('WP_SMSN1_RU_VERSION', '1.7.2');
+    define('WP_SMSN1_RU_VERSION', '1.8.0');
 }
 
 // Подключение необходимых файлов
@@ -154,21 +154,25 @@ function wp_smsn1_ru_login_form_shortcode() {
     if (function_exists('wp_smsn1_ru_oauth_notice_html')) {
         echo wp_smsn1_ru_oauth_notice_html();
     }
-	$balance = wp_smsn1_ru_get_balance();
-	if (is_user_logged_in()) 
-		include wp_smsn1_ru_locate_template('exit-form.php');
-	else	{
-	    //проверяем, может проблемы с плагином
-		if($balance >= 10 && $balance != "Проблема с соединением") {
-			if(get_option('wp_smsn1_ru_email_not_need_mode') != 'yes') include wp_smsn1_ru_locate_template('login-form.php');
-			else include wp_smsn1_ru_locate_template('reg-login-form.php');
-		}
-		else 	{
-			include wp_smsn1_ru_locate_template('error-form.php');	
-		}	
-	}	
+
+    $balance = wp_smsn1_ru_get_balance();
+
+    if (is_user_logged_in()) {
+        include wp_smsn1_ru_locate_template('exit-form.php');
+    } elseif ($balance >= 10 && $balance !== WP_SMSN1_RU_BALANCE_ERROR) {
+        if (get_option('wp_smsn1_ru_email_not_need_mode') != 'yes') {
+            include wp_smsn1_ru_locate_template('login-form.php');
+        } else {
+            include wp_smsn1_ru_locate_template('reg-login-form.php');
+        }
+    } else {
+        $wp_smsn1_ru_sms_unavailable = ($balance === WP_SMSN1_RU_BALANCE_ERROR) ? 'connection' : 'balance';
+        include wp_smsn1_ru_locate_template('error-form.php');
+    }
+
     return ob_get_clean();
 }
+
 // Шорткод для формы регистрации
 function wp_smsn1_ru_register_form_shortcode() {
     ob_start();
@@ -176,15 +180,18 @@ function wp_smsn1_ru_register_form_shortcode() {
     if (function_exists('wp_smsn1_ru_oauth_notice_html')) {
         echo wp_smsn1_ru_oauth_notice_html();
     }
-	$balance = wp_smsn1_ru_get_balance();
-	if (is_user_logged_in()) 
-		include plugin_dir_path(__FILE__) . 'templates/exit-form.php';
-	else {
-		if($balance >= 10 && $balance != "Проблема с соединением") 
-			include wp_smsn1_ru_locate_template('register-form.php');
-		else 	
-			include wp_smsn1_ru_locate_template('error-form.php');	
-	}	
+
+    $balance = wp_smsn1_ru_get_balance();
+
+    if (is_user_logged_in()) {
+        include wp_smsn1_ru_locate_template('exit-form.php');
+    } elseif ($balance >= 10 && $balance !== WP_SMSN1_RU_BALANCE_ERROR) {
+        include wp_smsn1_ru_locate_template('register-form.php');
+    } else {
+        $wp_smsn1_ru_sms_unavailable = ($balance === WP_SMSN1_RU_BALANCE_ERROR) ? 'connection' : 'balance';
+        include wp_smsn1_ru_locate_template('error-form.php');
+    }
+
     return ob_get_clean();
 }
 //Функция привода номера к единому виду и страховка от взлома
