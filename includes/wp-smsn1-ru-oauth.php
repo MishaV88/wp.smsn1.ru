@@ -73,6 +73,7 @@ function wp_smsn1_ru_oauth_redirect_uri()
 function wp_smsn1_ru_oauth_add_rewrite()
 {
     add_rewrite_rule('^wp-smsn1-ru-oauth/?$', 'index.php?wp_smsn1_ru_oauth_callback=1', 'top');
+    add_rewrite_rule('^wp-smsn1-ru-oauth/([a-z0-9_-]+)/link/([a-f0-9]+)/?$', 'index.php?wp_smsn1_ru_oauth_widget=$matches[1]&wp_smsn1_ru_link_token=$matches[2]', 'top');
     add_rewrite_rule('^wp-smsn1-ru-oauth/([a-z0-9_-]+)/?$', 'index.php?wp_smsn1_ru_oauth_widget=$matches[1]', 'top');
 }
 add_action('init', 'wp_smsn1_ru_oauth_add_rewrite', 5);
@@ -84,6 +85,7 @@ function wp_smsn1_ru_oauth_query_vars($vars)
 {
     $vars[] = 'wp_smsn1_ru_oauth_callback';
     $vars[] = 'wp_smsn1_ru_oauth_widget';
+    $vars[] = 'wp_smsn1_ru_link_token';
 
     return $vars;
 }
@@ -99,7 +101,12 @@ function wp_smsn1_ru_oauth_maybe_callback()
     $widget_provider = get_query_var('wp_smsn1_ru_oauth_widget');
 
     if (!empty($widget_provider)) {
-        wp_smsn1_ru_oauth_widget_callback(sanitize_key($widget_provider));
+        $link_token = get_query_var('wp_smsn1_ru_link_token');
+
+        wp_smsn1_ru_oauth_widget_callback(
+            sanitize_key($widget_provider),
+            $link_token ? sanitize_key($link_token) : ''
+        );
         return;
     }
 
@@ -516,11 +523,34 @@ function wp_smsn1_ru_oauth_profile_section_html($user_id, $redirect_to = '')
     $rows        = array();
 
     foreach (wp_smsn1_ru_oauth_providers() as $id => $provider) {
-        if (!$provider->is_configured() || $provider instanceof WP_SMSN1_RU_Auth_Provider_Widget) {
+        if (!$provider->is_configured()) {
             continue;
         }
 
         $linked = get_user_meta($user_id, wp_smsn1_ru_oauth_meta_key($id), true);
+
+        // Виджетные провайдеры (Telegram): привязка через одноразовый токен в auth-url
+        if ($provider instanceof WP_SMSN1_RU_Auth_Provider_Widget) {
+            if ($linked) {
+                $rows[] = sprintf(
+                    '<li class="wp-smsn1-ru-linked__item"><span class="wp-smsn1-ru-linked__name">%1$s</span>'
+                    . '<span class="wp-smsn1-ru-linked__state wp-smsn1-ru-linked__state--ok">привязан</span></li>',
+                    esc_html($provider->get_label())
+                );
+            } else {
+                $token = wp_smsn1_ru_oauth_create_link_token($user_id, $id, $redirect_to);
+                $url   = home_url('/wp-smsn1-ru-oauth/' . $id . '/link/' . $token . '/');
+
+                $rows[] = sprintf(
+                    '<li class="wp-smsn1-ru-linked__item wp-smsn1-ru-linked__item--widget">'
+                    . '<span class="wp-smsn1-ru-linked__name">%1$s</span>%2$s</li>',
+                    esc_html($provider->get_label()),
+                    $provider->get_button_html($url)
+                );
+            }
+
+            continue;
+        }
 
         if ($linked) {
             $rows[] = sprintf(
@@ -565,6 +595,31 @@ function wp_smsn1_ru_oauth_profile_section_html($user_id, $redirect_to = '')
         . '<p class="wp-smsn1-ru-linked__intro">Привяжите сервис — и сможете входить в этот аккаунт без СМС.</p>'
         . '<ul class="wp-smsn1-ru-linked__list">' . implode('', $rows) . '</ul>'
         . '</div>';
+}
+
+/**
+ * Одноразовый токен привязки для виджетного провайдера.
+ *
+ * @param int    $user_id     Пользователь.
+ * @param string $provider_id Провайдер.
+ * @param string $redirect_to Куда вернуть после привязки.
+ * @return string
+ */
+function wp_smsn1_ru_oauth_create_link_token($user_id, $provider_id, $redirect_to = '')
+{
+    $token = wp_smsn1_ru_random_hex(16);
+
+    set_transient(
+        'wp_smsn1_ru_link_' . $token,
+        array(
+            'user_id'     => (int) $user_id,
+            'provider'    => (string) $provider_id,
+            'redirect_to' => $redirect_to,
+        ),
+        10 * MINUTE_IN_SECONDS
+    );
+
+    return $token;
 }
 
 /**
@@ -617,7 +672,7 @@ function wp_smsn1_ru_oauth_linked_notice()
  *
  * @param string $provider_id Идентификатор провайдера.
  */
-function wp_smsn1_ru_oauth_widget_callback($provider_id)
+function wp_smsn1_ru_oauth_widget_callback($provider_id, $link_token = '')
 {
     $provider = wp_smsn1_ru_oauth_get_provider($provider_id);
 
@@ -633,6 +688,27 @@ function wp_smsn1_ru_oauth_widget_callback($provider_id)
             esc_html('Вход не выполнен'),
             array('response' => 400)
         );
+    }
+
+    // Привязка к текущему аккаунту по одноразовому токену из личного кабинета
+    if ($link_token !== '') {
+        $link = get_transient('wp_smsn1_ru_link_' . $link_token);
+        delete_transient('wp_smsn1_ru_link_' . $link_token);
+
+        if (!is_array($link) || (int) $link['user_id'] !== get_current_user_id() || $link['provider'] !== $provider->get_id()) {
+            wp_die(
+                esc_html('Ссылка привязки истекла или открыта не в том аккаунте. Войдите и попробуйте снова.'),
+                esc_html('Не удалось привязать'),
+                array('response' => 400)
+            );
+        }
+
+        update_user_meta((int) $link['user_id'], wp_smsn1_ru_oauth_meta_key($provider->get_id()), $profile['uid']);
+
+        $back = !empty($link['redirect_to']) ? $link['redirect_to'] : home_url('/');
+
+        wp_safe_redirect(add_query_arg('wp_smsn1_ru_linked', $provider->get_id(), $back));
+        exit;
     }
 
     $user_id = wp_smsn1_ru_oauth_find_user($provider->get_id(), $profile['uid']);
