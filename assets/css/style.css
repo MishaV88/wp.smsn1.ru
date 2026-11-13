@@ -317,6 +317,7 @@
     margin: 0 0 0.6rem;
     color: var(--wp-smsn1-ru-muted);
     font-size: 0.9rem;
+    text-align: center;
 }
 
 .wp-smsn1-ru-telegram-fallback {
