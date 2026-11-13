@@ -36,9 +36,12 @@ class WP_SMSN1_RU_Provider_Telegram implements WP_SMSN1_RU_Auth_Provider_Widget
     public function get_button_html($callback_url)
     {
         return sprintf(
-            '<div class="wp-smsn1-ru-oauth wp-smsn1-ru-oauth-telegram">'
+            '<div class="wp-smsn1-ru-oauth-telegram" data-wp-smsn1-ru-telegram>'
             . '<script async src="%1$s" data-telegram-login="%2$s" data-size="large" '
-            . 'data-auth-url="%3$s" data-request-access="write"></script></div>',
+            . 'data-auth-url="%3$s" data-request-access="write"></script>'
+            . '<p class="wp-smsn1-ru-telegram-fallback" hidden>'
+            . 'Вход через Telegram недоступен в вашей сети — используйте СМС-код или VK ID.'
+            . '</p></div>',
             esc_url(self::WIDGET_URL),
             esc_attr((string) get_option('wp_smsn1_ru_telegram_bot')),
             esc_url($callback_url)

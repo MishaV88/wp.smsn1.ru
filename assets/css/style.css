@@ -280,3 +280,87 @@
 #wp_smsn1_ru_custom_phone_field .form-row {
     margin-bottom: 0.75rem;
 }
+
+/* Разделитель и блок соцсетей */
+
+.wp-smsn1-ru-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.25rem 0 1rem;
+    color: var(--wp-smsn1-ru-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.wp-smsn1-ru-divider::before,
+.wp-smsn1-ru-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--wp-smsn1-ru-border);
+}
+
+.wp-smsn1-ru-oauth-block {
+    margin: 0;
+}
+
+.wp-smsn1-ru-oauth-title {
+    margin: 0 0 0.6rem;
+    color: var(--wp-smsn1-ru-muted);
+    font-size: 0.9rem;
+}
+
+.wp-smsn1-ru-telegram-fallback {
+    margin: 0.5rem 0 0;
+    padding: 0.5rem 0.65rem;
+    border-left: 3px solid #dba617;
+    border-radius: 3px;
+    background: #fcf9e8;
+    color: #1d2327;
+    font-size: 0.85rem;
+    line-height: 1.45;
+}
+
+/* Привязка сервисов в профиле и личном кабинете */
+
+.wp-smsn1-ru-linked {
+    margin: 1.5rem 0;
+}
+
+.wp-smsn1-ru-linked__title {
+    margin: 0 0 0.5rem;
+    font-size: 1.15rem;
+}
+
+.wp-smsn1-ru-linked__intro {
+    margin: 0 0 0.75rem;
+    color: var(--wp-smsn1-ru-muted, #646970);
+    font-size: 0.9rem;
+}
+
+.wp-smsn1-ru-linked__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.wp-smsn1-ru-linked__item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--wp-smsn1-ru-border, #dcdcde);
+}
+
+.wp-smsn1-ru-linked__name {
+    font-weight: 600;
+}
+
+.wp-smsn1-ru-linked__state--ok {
+    color: #00a32a;
+    font-size: 0.9rem;
+}

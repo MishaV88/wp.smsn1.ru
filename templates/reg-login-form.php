@@ -8,8 +8,6 @@
     <h2 class="wp-smsn1-ru-form__title">Вход или регистрация</h2>
     <p class="wp-smsn1-ru-form__intro">Если аккаунта ещё нет, он будет создан автоматически.</p>
 
-    <?php if (function_exists('wp_smsn1_ru_oauth_buttons_html')) { echo wp_smsn1_ru_oauth_buttons_html(); } ?>
-
     <form id="wp-smsn1-ru-login-form" class="wp-smsn1-ru-form__body">
         <div class="wp-smsn1-ru-field">
             <label for="phone_number">Номер телефона</label>
@@ -38,6 +36,12 @@
     </form>
 
     <div id="wp-smsn1-ru-message" class="wp-smsn1-ru-message" role="status" aria-live="polite"></div>
+
+    <?php $oauth_buttons = function_exists('wp_smsn1_ru_oauth_buttons_html') ? wp_smsn1_ru_oauth_buttons_html() : ''; ?>
+    <?php if ($oauth_buttons !== '') : ?>
+    <div class="wp-smsn1-ru-divider"><span>или</span></div>
+    <?php echo $oauth_buttons; ?>
+    <?php endif; ?>
 
     <p class="wp-smsn1-ru-privacy">
         <a href="<?php echo esc_url(home_url('/privacy-policy/')); ?>" target="_blank" rel="noopener">Продолжая, вы соглашаетесь с политикой обработки персональных данных.</a>
