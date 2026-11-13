@@ -256,9 +256,7 @@ function wp_smsn1_ru_oauth_callback()
 
         update_user_meta($user_id, wp_smsn1_ru_oauth_meta_key($provider->get_id()), $profile['uid']);
 
-    if (!empty($profile['phone'])) {
-        update_user_meta($user_id, '_wp_smsn1_ru_vk_phone', sanitize_text_field($profile['phone']));
-    }
+    wp_smsn1_ru_oauth_apply_profile($user_id, $profile, $provider->get_id());
 
         $back = !empty($data['redirect_to']) ? $data['redirect_to'] : admin_url('profile.php');
 
@@ -552,15 +550,6 @@ function wp_smsn1_ru_oauth_profile_section_html($user_id, $redirect_to = '')
             continue;
         }
 
-        if ($linked) {
-            $rows[] = sprintf(
-                '<li class="wp-smsn1-ru-linked__item"><span class="wp-smsn1-ru-linked__name">%1$s</span>'
-                . '<span class="wp-smsn1-ru-linked__state wp-smsn1-ru-linked__state--ok">привязан</span></li>',
-                esc_html($provider->get_label())
-            );
-            continue;
-        }
-
         $url = add_query_arg(
             array(
                 'wp_smsn1_ru_oauth' => $id,
@@ -569,6 +558,17 @@ function wp_smsn1_ru_oauth_profile_section_html($user_id, $redirect_to = '')
             ),
             home_url('/')
         );
+
+        if ($linked) {
+            $rows[] = sprintf(
+                '<li class="wp-smsn1-ru-linked__item"><span class="wp-smsn1-ru-linked__name">%1$s</span>'
+                . '<span class="wp-smsn1-ru-linked__state wp-smsn1-ru-linked__state--ok">привязан</span>'
+                . '<a class="wp-smsn1-ru-linked__refresh" href="%2$s">обновить данные</a></li>',
+                esc_html($provider->get_label()),
+                esc_url($url)
+            );
+            continue;
+        }
 
         $rows[] = sprintf(
             '<li class="wp-smsn1-ru-linked__item"><span class="wp-smsn1-ru-linked__name">%1$s</span>'
@@ -595,6 +595,55 @@ function wp_smsn1_ru_oauth_profile_section_html($user_id, $redirect_to = '')
         . '<p class="wp-smsn1-ru-linked__intro">Привяжите сервис — и сможете входить в этот аккаунт без СМС.</p>'
         . '<ul class="wp-smsn1-ru-linked__list">' . implode('', $rows) . '</ul>'
         . '</div>';
+}
+
+/**
+ * Переносит в аккаунт данные профиля провайдера: телефон и e-mail, если их ещё нет.
+ *
+ * Телефон записывается в billing_phone только если он свободен и у аккаунта пусто:
+ * это ключ поиска пользователя, дубли недопустимы.
+ *
+ * @param int    $user_id     Пользователь.
+ * @param array  $profile     Профиль от провайдера.
+ * @param string $provider_id Провайдер.
+ */
+function wp_smsn1_ru_oauth_apply_profile($user_id, $profile, $provider_id)
+{
+    $user_id = (int) $user_id;
+
+    if ($user_id <= 0) {
+        return;
+    }
+
+    $user = get_user_by('id', $user_id);
+
+    if (!$user) {
+        return;
+    }
+
+    if (!empty($profile['phone']) && function_exists('sanitize_my_phone_for_field')) {
+        $phone = sanitize_my_phone_for_field($profile['phone']);
+
+        if ($phone !== 'not_russian_num') {
+            update_user_meta($user_id, '_wp_smsn1_ru_' . sanitize_key($provider_id) . '_phone', $phone);
+
+            $owner      = function_exists('wp_smsn1_ru_get_user_by_phone') ? wp_smsn1_ru_get_user_by_phone($phone) : false;
+            $has_phone  = (string) get_user_meta($user_id, 'billing_phone', true) !== '';
+
+            if (!$has_phone && ($owner === false || (int) $owner === $user_id)) {
+                update_user_meta($user_id, 'billing_phone', $phone);
+            }
+        }
+    }
+
+    if ($user->user_email === '' && !empty($profile['email']) && is_email($profile['email']) && !email_exists($profile['email'])) {
+        wp_update_user(
+            array(
+                'ID'         => $user_id,
+                'user_email' => $profile['email'],
+            )
+        );
+    }
 }
 
 /**
@@ -704,6 +753,9 @@ function wp_smsn1_ru_oauth_widget_callback($provider_id, $link_token = '')
         }
 
         update_user_meta((int) $link['user_id'], wp_smsn1_ru_oauth_meta_key($provider->get_id()), $profile['uid']);
+
+        // Телефон и e-mail из профиля подставляем в аккаунт, если их там нет
+        wp_smsn1_ru_oauth_apply_profile((int) $link['user_id'], $profile, $provider->get_id());
 
         $back = !empty($link['redirect_to']) ? $link['redirect_to'] : home_url('/');
 

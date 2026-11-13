@@ -5,7 +5,7 @@
  * Plugin URI:  https://wp.smsn1.ru/
  * Author URI:  https://docs-group.ru/
  * Support URI: https://wp.smsn1.ru/контакты-службы-поддержки/
- * Version: 1.7.0
+ * Version: 1.7.1
  * Author: Vasilev Mikhail Y.
  * License:     GPL2
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 }
 
 if (!defined('WP_SMSN1_RU_VERSION')) {
-    define('WP_SMSN1_RU_VERSION', '1.7.0');
+    define('WP_SMSN1_RU_VERSION', '1.7.1');
 }
 
 // Подключение необходимых файлов

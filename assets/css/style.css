@@ -371,3 +371,9 @@
     color: #00a32a;
     font-size: 0.9rem;
 }
+
+.wp-smsn1-ru-linked__refresh {
+    color: var(--wp-smsn1-ru-muted, #646970);
+    font-size: 0.85rem;
+    text-decoration: underline;
+}
