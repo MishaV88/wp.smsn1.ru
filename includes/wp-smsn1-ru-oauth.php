@@ -410,7 +410,10 @@ function wp_smsn1_ru_oauth_buttons_html()
         return '';
     }
 
-    return '<div class="wp-smsn1-ru-oauth">' . implode('', $buttons) . '</div>';
+    return '<div class="wp-smsn1-ru-oauth-block">'
+        . '<p class="wp-smsn1-ru-oauth-title">Войти другим способом</p>'
+        . implode('', $buttons)
+        . '</div>';
 }
 
 /**
@@ -489,47 +492,102 @@ add_action('show_user_profile', 'wp_smsn1_ru_oauth_profile_section');
 add_action('edit_user_profile', 'wp_smsn1_ru_oauth_profile_section');
 function wp_smsn1_ru_oauth_profile_section($user)
 {
-    $rows = array();
+    echo wp_smsn1_ru_oauth_profile_section_html($user->ID, admin_url('profile.php'));
+}
+
+/**
+ * HTML блока «Способы входа» с привязкой провайдеров.
+ *
+ * @param int    $user_id     Пользователь.
+ * @param string $redirect_to Куда вернуть после привязки.
+ * @return string
+ */
+function wp_smsn1_ru_oauth_profile_section_html($user_id, $redirect_to = '')
+{
+    $user_id = (int) $user_id;
+
+    if ($user_id <= 0) {
+        return '';
+    }
+
+    $redirect_to = $redirect_to !== '' ? $redirect_to : admin_url('profile.php');
+    $rows        = array();
 
     foreach (wp_smsn1_ru_oauth_providers() as $id => $provider) {
         if (!$provider->is_configured() || $provider instanceof WP_SMSN1_RU_Auth_Provider_Widget) {
             continue;
         }
 
-        $linked = get_user_meta($user->ID, wp_smsn1_ru_oauth_meta_key($id), true);
+        $linked = get_user_meta($user_id, wp_smsn1_ru_oauth_meta_key($id), true);
 
         if ($linked) {
             $rows[] = sprintf(
-                '<li><strong>%1$s:</strong> привязан (ID %2$s)</li>',
-                esc_html($provider->get_label()),
-                esc_html($linked)
+                '<li class="wp-smsn1-ru-linked__item"><span class="wp-smsn1-ru-linked__name">%1$s</span>'
+                . '<span class="wp-smsn1-ru-linked__state wp-smsn1-ru-linked__state--ok">привязан</span></li>',
+                esc_html($provider->get_label())
             );
-        } else {
-            $url = add_query_arg(
-                array(
-                    'wp_smsn1_ru_oauth' => $id,
-                    'link'              => '1',
-                    'redirect_to'       => admin_url('profile.php'),
-                ),
-                home_url('/')
-            );
-
-            $rows[] = sprintf(
-                '<li><strong>%1$s:</strong> не привязан. <a class="button" href="%2$s">Привязать</a></li>',
-                esc_html($provider->get_label()),
-                esc_url($url)
-            );
+            continue;
         }
+
+        $url = add_query_arg(
+            array(
+                'wp_smsn1_ru_oauth' => $id,
+                'link'              => '1',
+                'redirect_to'       => $redirect_to,
+            ),
+            home_url('/')
+        );
+
+        $rows[] = sprintf(
+            '<li class="wp-smsn1-ru-linked__item"><span class="wp-smsn1-ru-linked__name">%1$s</span>'
+            . '<a class="wp-smsn1-ru-button wp-smsn1-ru-button--secondary" href="%2$s">Привязать</a></li>',
+            esc_html($provider->get_label()),
+            esc_url($url)
+        );
     }
 
     if (empty($rows)) {
+        return '';
+    }
+
+    return '<div class="wp-smsn1-ru-linked">'
+        . '<h2 class="wp-smsn1-ru-linked__title">Способы входа</h2>'
+        . '<p class="wp-smsn1-ru-linked__intro">Привяжите сервис — и сможете входить в этот аккаунт без СМС.</p>'
+        . '<ul class="wp-smsn1-ru-linked__list">' . implode('', $rows) . '</ul>'
+        . '</div>';
+}
+
+/**
+ * Тот же блок в личном кабинете WooCommerce (фронтенд).
+ */
+add_action('woocommerce_account_dashboard', 'wp_smsn1_ru_oauth_woo_account_section');
+add_action('woocommerce_edit_account_form', 'wp_smsn1_ru_oauth_woo_account_section');
+function wp_smsn1_ru_oauth_woo_account_section()
+{
+    if (!is_user_logged_in()) {
         return;
     }
 
-    echo '<h2>Способы входа</h2>';
-    echo '<table class="form-table"><tr><th>Внешние сервисы</th><td><ul style="margin:0;">';
-    echo implode('', $rows);
-    echo '</ul><p class="description">Привязанный сервис позволяет входить в этот аккаунт без СМС.</p></td></tr></table>';
+    $redirect = function_exists('wc_get_page_permalink')
+        ? wc_get_page_permalink('myaccount')
+        : home_url('/');
+
+    echo wp_smsn1_ru_oauth_profile_section_html(get_current_user_id(), $redirect);
+}
+
+/**
+ * Шорткод для вывода блока в любом месте: [wp_smsn1_ru_login_methods]
+ */
+add_shortcode('wp_smsn1_ru_login_methods', 'wp_smsn1_ru_oauth_login_methods_shortcode');
+function wp_smsn1_ru_oauth_login_methods_shortcode()
+{
+    if (!is_user_logged_in()) {
+        return '';
+    }
+
+    $url = get_permalink();
+
+    return wp_smsn1_ru_oauth_profile_section_html(get_current_user_id(), $url ? $url : home_url('/'));
 }
 
 /**

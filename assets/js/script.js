@@ -231,4 +231,15 @@ jQuery(document).ready(function ($) {
             }
         });
     });
+
+    // Если скрипт Telegram не загрузился (сеть блокирует telegram.org) — показываем пояснение
+    setTimeout(function () {
+        $('[data-wp-smsn1-ru-telegram]').each(function () {
+            var $block = $(this);
+
+            if ($block.find('iframe').length === 0) {
+                $block.find('.wp-smsn1-ru-telegram-fallback').prop('hidden', false);
+            }
+        });
+    }, 3500);
 });
