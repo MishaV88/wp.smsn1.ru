@@ -253,7 +253,9 @@ function wp_smsn1_ru_oauth_callback()
         update_user_meta($user_id, '_wp_smsn1_ru_vk_phone', sanitize_text_field($profile['phone']));
     }
 
-        wp_safe_redirect(add_query_arg('wp_smsn1_ru_linked', $provider->get_id(), admin_url('profile.php')));
+        $back = !empty($data['redirect_to']) ? $data['redirect_to'] : admin_url('profile.php');
+
+        wp_safe_redirect(add_query_arg('wp_smsn1_ru_linked', $provider->get_id(), $back));
         exit;
     }
 
@@ -550,7 +552,15 @@ function wp_smsn1_ru_oauth_profile_section_html($user_id, $redirect_to = '')
         return '';
     }
 
-    return '<div class="wp-smsn1-ru-linked">'
+    $notice = '';
+
+    if (!empty($_GET['wp_smsn1_ru_linked'])) {
+        $notice = '<div class="wp-smsn1-ru-notice wp-smsn1-ru-notice--success" role="status">'
+            . 'Сервис привязан к аккаунту — теперь можно входить через него.'
+            . '</div>';
+    }
+
+    return $notice . '<div class="wp-smsn1-ru-linked">'
         . '<h2 class="wp-smsn1-ru-linked__title">Способы входа</h2>'
         . '<p class="wp-smsn1-ru-linked__intro">Привяжите сервис — и сможете входить в этот аккаунт без СМС.</p>'
         . '<ul class="wp-smsn1-ru-linked__list">' . implode('', $rows) . '</ul>'

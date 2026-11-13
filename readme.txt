@@ -6,7 +6,7 @@ Tags: sms, notification, woocommerce, OTP, verification, one time password,login
 Requires at least: 4.1
 Tested up to: 6.7
 Requires PHP: 5.6
-Stable tag: 1.6.0
+Stable tag: 1.6.1
 License: GPL-2.0+
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
