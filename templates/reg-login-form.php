@@ -39,7 +39,11 @@
 
     <?php $oauth_buttons = function_exists('wp_smsn1_ru_oauth_buttons_html') ? wp_smsn1_ru_oauth_buttons_html() : ''; ?>
     <?php if ($oauth_buttons !== '') : ?>
-    <div class="wp-smsn1-ru-divider"><span>или</span></div>
+    <div class="wp-smsn1-ru-divider" aria-hidden="true">
+        <span class="wp-smsn1-ru-divider__line"></span>
+        <span class="wp-smsn1-ru-divider__text">или</span>
+        <span class="wp-smsn1-ru-divider__line"></span>
+    </div>
     <?php echo $oauth_buttons; ?>
     <?php endif; ?>
 
