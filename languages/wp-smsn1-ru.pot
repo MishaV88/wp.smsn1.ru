@@ -1,0 +1,316 @@
+# Copyright (C) 2026 Vasilev Mikhail Y.
+# This file is distributed under the GPL-2.0-or-later license.
+msgid ""
+msgstr ""
+"Project-Id-Version: WP.SMSn1.RU 1.8.0\n"
+"Report-Msgid-Bugs-To: https://wp.smsn1.ru/\n"
+"POT-Creation-Date: 2026-11-15 13:32+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: wp-smsn1-ru make-pot\n"
+"X-Domain: wp-smsn1-ru\n"
+
+#: includes/wp-smsn1-ru-oauth.php:412
+msgid "Войти через %s"
+msgstr ""
+
+#: includes/wp-smsn1-ru-oauth.php:421
+msgid "Войти другим способом"
+msgstr ""
+
+#: includes/wp-smsn1-ru-oauth.php:451
+msgid "Аккаунт с таким e-mail уже существует. Войдите в него, а затем привяжите VK ID в профиле — мы не объединяем аккаунты автоматически."
+msgstr ""
+
+#: includes/wp-smsn1-ru-oauth.php:452
+msgid "Аккаунт с таким номером телефона уже существует. Войдите в него, а затем привяжите VK ID в профиле."
+msgstr ""
+
+#: includes/wp-smsn1-ru-oauth.php:537
+#: includes/wp-smsn1-ru-oauth.php:569
+msgid "привязан"
+msgstr ""
+
+#: includes/wp-smsn1-ru-oauth.php:571
+msgid "обновить данные"
+msgstr ""
+
+#: includes/wp-smsn1-ru-oauth.php:581
+msgid "Привязать"
+msgstr ""
+
+#: includes/wp-smsn1-ru-oauth.php:593
+msgid "Сервис привязан к аккаунту — теперь можно входить через него."
+msgstr ""
+
+#: includes/wp-smsn1-ru-oauth.php:598
+msgid "Способы входа"
+msgstr ""
+
+#: includes/wp-smsn1-ru-oauth.php:599
+msgid "Привяжите сервис — и сможете входить в этот аккаунт без СМС."
+msgstr ""
+
+#: includes/wp-smsn1-ru-oauth.php:718
+msgid "Сервис привязан к аккаунту."
+msgstr ""
+
+#: includes/wp-smsn1-ru-otp.php:100
+msgid "Код не найден или истёк. Запросите новый код."
+msgstr ""
+
+#: includes/wp-smsn1-ru-otp.php:120
+msgid "Слишком много неверных попыток. Запросите новый код."
+msgstr ""
+
+#: includes/wp-smsn1-ru-otp.php:127
+msgid "Неверный код. Осталось попыток: %d"
+msgstr ""
+
+#: includes/wp-smsn1-ru-otp.php:195
+msgid "%d сек."
+msgstr ""
+
+#: includes/wp-smsn1-ru-otp.php:198
+msgid "%d мин."
+msgstr ""
+
+#: includes/wp-smsn1-ru-otp.php:214
+msgid "Код уже отправлен. Повторить можно через %d сек."
+msgstr ""
+
+#: includes/wp-smsn1-ru-otp.php:219
+msgid "Слишком много запросов кода на этот номер. Повторите через %s."
+msgstr ""
+
+#: includes/wp-smsn1-ru-otp.php:224
+msgid "Слишком много запросов. Повторите через %s."
+msgstr ""
+
+#: includes/wp-smsn1-ru-otp.php:268
+msgid "Пароль должен быть не короче 8 символов."
+msgstr ""
+
+#: templates/error-form.php:12
+msgid "Сервис отправки СМС сейчас недоступен, поэтому вход по коду временно не работает. Остальные способы входа ниже."
+msgstr ""
+
+#: templates/error-form.php:13
+msgid "На балансе сервиса СМС недостаточно средств, поэтому вход по коду временно не работает. Остальные способы входа ниже."
+msgstr ""
+
+#: templates/error-form.php:16
+msgid "Вход по коду временно недоступен"
+msgstr ""
+
+#: templates/error-form.php:20
+msgid "Войти по логину и паролю"
+msgstr ""
+
+#: templates/error-form.php:28
+#: templates/login-form.php:47
+#: templates/reg-login-form.php:44
+#: templates/register-form.php:58
+msgid "или"
+msgstr ""
+
+#: templates/error-form.php:36
+msgid "Забыли пароль?"
+msgstr ""
+
+#: templates/exit-form.php:8
+msgid "Вы уже авторизованы"
+msgstr ""
+
+#: templates/exit-form.php:9
+msgid "Чтобы войти под другим аккаунтом, сначала выйдите."
+msgstr ""
+
+#: templates/exit-form.php:11
+msgid "Выйти"
+msgstr ""
+
+#: templates/login-form.php:8
+msgid "Вход на сайт"
+msgstr ""
+
+#: templates/login-form.php:12
+#: templates/reg-login-form.php:13
+#: templates/register-form.php:19
+msgid "Номер телефона"
+msgstr ""
+
+#: templates/login-form.php:13
+#: templates/reg-login-form.php:14
+#: templates/register-form.php:20
+msgid "+7 999 123-45-67"
+msgstr ""
+
+#: templates/login-form.php:18
+#: templates/reg-login-form.php:19
+#: templates/register-form.php:25
+msgid "Пароль"
+msgstr ""
+
+#: templates/login-form.php:19
+#: templates/reg-login-form.php:20
+msgid "Если пароля ещё нет — придумайте его"
+msgstr ""
+
+#: templates/login-form.php:24
+#: templates/reg-login-form.php:25
+#: templates/register-form.php:35
+msgid "Код из СМС"
+msgstr ""
+
+#: templates/login-form.php:25
+#: templates/reg-login-form.php:26
+#: templates/register-form.php:36
+msgid "5 цифр"
+msgstr ""
+
+#: templates/login-form.php:29
+#: templates/reg-login-form.php:30
+#: templates/register-form.php:40
+#: wp-smsn1-ru.php:168
+msgid "Отправить код"
+msgstr ""
+
+#: templates/login-form.php:30
+#: templates/reg-login-form.php:31
+msgid "Войти"
+msgstr ""
+
+#: templates/login-form.php:34
+#: templates/register-form.php:41
+msgid "Зарегистрироваться"
+msgstr ""
+
+#: templates/login-form.php:54
+#: templates/reg-login-form.php:51
+#: templates/register-form.php:65
+msgid "Продолжая, вы соглашаетесь с политикой обработки персональных данных."
+msgstr ""
+
+#: templates/reg-login-form.php:8
+msgid "Вход или регистрация"
+msgstr ""
+
+#: templates/reg-login-form.php:9
+msgid "Если аккаунта ещё нет, он будет создан автоматически."
+msgstr ""
+
+#: templates/register-form.php:8
+msgid "Регистрация"
+msgstr ""
+
+#: templates/register-form.php:9
+msgid "Если номер уже зарегистрирован, вы просто войдёте в аккаунт."
+msgstr ""
+
+#: templates/register-form.php:13
+msgid "E-mail"
+msgstr ""
+
+#: templates/register-form.php:14
+msgid "myemail@domain.ru"
+msgstr ""
+
+#: templates/register-form.php:15
+msgid "Нужен для восстановления доступа, если возникнут проблемы с СМС."
+msgstr ""
+
+#: templates/register-form.php:26
+msgid "Не короче 8 символов"
+msgstr ""
+
+#: templates/register-form.php:29
+msgid "Повторите пароль"
+msgstr ""
+
+#: templates/register-form.php:30
+msgid "Ещё раз"
+msgstr ""
+
+#: templates/register-form.php:45
+msgid "У меня уже есть аккаунт"
+msgstr ""
+
+#: wp-smsn1-ru.php:162
+msgid "Ошибка при отправке запроса. Попробуйте ещё раз."
+msgstr ""
+
+#: wp-smsn1-ru.php:163
+#: wp-smsn1-ru.php:350
+msgid "Пароли не совпадают."
+msgstr ""
+
+#: wp-smsn1-ru.php:164
+msgid "Сначала получите код из СМС."
+msgstr ""
+
+#: wp-smsn1-ru.php:165
+msgid "Пользователь с таким номером телефона уже существует."
+msgstr ""
+
+#: wp-smsn1-ru.php:166
+msgid "Войдите в систему"
+msgstr ""
+
+#: wp-smsn1-ru.php:167
+msgid "Не удалось проверить номер телефона."
+msgstr ""
+
+#: wp-smsn1-ru.php:169
+msgid "Отправить код (%d сек)"
+msgstr ""
+
+#: wp-smsn1-ru.php:271
+#: wp-smsn1-ru.php:316
+msgid "Проверьте номер телефона: доставка СМС работает только на номера Российской Федерации."
+msgstr ""
+
+#: wp-smsn1-ru.php:280
+msgid "Номер не найден. <a href=\"%s\">Зарегистрируйтесь</a> — это займёт около 30 секунд."
+msgstr ""
+
+#: wp-smsn1-ru.php:300
+msgid "Ошибка при отправке СМС: %s"
+msgstr ""
+
+#: wp-smsn1-ru.php:306
+msgid "Код отправлен на ваш номер: %s"
+msgstr ""
+
+#: wp-smsn1-ru.php:334
+msgid "Укажите корректный e-mail: он потребуется для восстановления доступа."
+msgstr ""
+
+#: wp-smsn1-ru.php:338
+msgid "Этот e-mail уже зарегистрирован."
+msgstr ""
+
+#: wp-smsn1-ru.php:346
+msgid "Введите пароль. Если вы ещё не задавали пароль, придумайте новый — он сохранится после подтверждения кода."
+msgstr ""
+
+#: wp-smsn1-ru.php:359
+msgid "Слишком много неверных попыток ввода пароля. Попробуйте через 15 минут."
+msgstr ""
+
+#: wp-smsn1-ru.php:364
+msgid "Неверный пароль."
+msgstr ""
+
+#: wp-smsn1-ru.php:390
+msgid "Ошибка при создании пользователя: %s"
+msgstr ""
+
+#: wp-smsn1-ru.php:394
+msgid "Ошибка при создании пользователя."
+msgstr ""
+
+#: wp-smsn1-ru.php:407
+msgid "Не удалось загрузить учётную запись."
+msgstr ""

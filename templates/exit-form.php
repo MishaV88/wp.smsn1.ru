@@ -5,9 +5,9 @@
  */
 ?>
 <div class="wp-smsn1-ru-form">
-    <h2 class="wp-smsn1-ru-form__title">Вы уже авторизованы</h2>
-    <p class="wp-smsn1-ru-form__intro">Чтобы войти под другим аккаунтом, сначала выйдите.</p>
+    <h2 class="wp-smsn1-ru-form__title"><?php esc_html_e('Вы уже авторизованы', 'wp-smsn1-ru'); ?></h2>
+    <p class="wp-smsn1-ru-form__intro"><?php esc_html_e('Чтобы войти под другим аккаунтом, сначала выйдите.', 'wp-smsn1-ru'); ?></p>
     <p class="wp-smsn1-ru-actions">
-        <a class="wp-smsn1-ru-button wp-smsn1-ru-button--secondary" href="<?php echo esc_url(wp_logout_url(home_url('/'))); ?>">Выйти</a>
+        <a class="wp-smsn1-ru-button wp-smsn1-ru-button--secondary" href="<?php echo esc_url(wp_logout_url(home_url('/'))); ?>"><?php esc_html_e('Выйти', 'wp-smsn1-ru'); ?></a>
     </p>
 </div>
