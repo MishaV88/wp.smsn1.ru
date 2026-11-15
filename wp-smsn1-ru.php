@@ -1,19 +1,31 @@
 <?php
 /*
- * Plugin Name: WP.SMSn1.RU(OTP&Verification by SMS): Одноразовый пароль и верификация по СМС
- * Description: Интеграция СМС уведомлений, верификация, регистрация и авторизация по номеру телефона с использованием одноразового кода из СМС. СМС уведомления в том числе для WooCommerce. Пока только для сотовых операторов Российской Федерации.
+ * Plugin Name: WP.SMSn1.RU — вход по номеру телефона и SMS-уведомления
+ * Description: Вход и регистрация по коду из СМС, режим 2FA, вход через VK ID и Telegram, подтверждение номера на checkout WooCommerce. Для номеров РФ; отправка СМС через сервис smsn1.ru.
  * Plugin URI:  https://wp.smsn1.ru/
  * Author URI:  https://docs-group.ru/
- * Support URI: https://wp.smsn1.ru/контакты-службы-поддержки/
  * Version: 1.8.0
+ * Requires at least: 5.6
+ * Requires PHP: 7.4
  * Author: Vasilev Mikhail Y.
- * License:     GPL2
+ * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: wp-smsn1-ru
+ * Domain Path: /languages
 */
 
 if (!defined('ABSPATH')) {
     exit; // Запрет прямого доступа к файлу
 }
+
+/**
+ * Подключение переводов. Домен совпадает со слагом плагина на WordPress.org.
+ */
+function wp_smsn1_ru_load_textdomain()
+{
+    load_plugin_textdomain('wp-smsn1-ru', false, dirname(plugin_basename(__FILE__)) . '/languages');
+}
+add_action('init', 'wp_smsn1_ru_load_textdomain');
 
 if (!defined('WP_SMSN1_RU_VERSION')) {
     define('WP_SMSN1_RU_VERSION', '1.8.0');
@@ -28,6 +40,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/auth/interface-wp-smsn1-ru-au
 require_once plugin_dir_path(__FILE__) . 'includes/auth/class-wp-smsn1-ru-provider-vk.php';
 require_once plugin_dir_path(__FILE__) . 'includes/auth/class-wp-smsn1-ru-provider-telegram.php';
 require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-oauth.php';
+require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-privacy.php';
 require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-admin.php'; //Этот файл будет содержать код для добавления настроек плагина в административной панели.
 // Проверка работоспособности плагина и активирован ли WooCommerce
 if (  wp_smsn1_ru_get_balance() >= 10 && wp_smsn1_ru_get_balance() != "Проблема с соединением" && in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) )) {
