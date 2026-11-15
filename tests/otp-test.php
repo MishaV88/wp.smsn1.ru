@@ -46,6 +46,23 @@ function wp_rand($min, $max)
     return random_int((int) $min, (int) $max);
 }
 
+/**
+ * Заглушки функций перевода: в тестах WordPress не загружается.
+ */
+if (!function_exists('__')) {
+    function __($text, $domain = null)
+    {
+        return $text;
+    }
+}
+
+if (!function_exists('esc_html__')) {
+    function esc_html__($text, $domain = null)
+    {
+        return $text;
+    }
+}
+
 require dirname(__DIR__) . '/includes/wp-smsn1-ru-otp.php';
 require dirname(__DIR__) . '/includes/auth/functions-pkce.php';
 

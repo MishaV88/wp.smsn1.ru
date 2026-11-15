@@ -45,6 +45,23 @@ function get_option($name, $default = false)
     return isset($options[$name]) ? $options[$name] : $default;
 }
 
+/**
+ * Заглушки функций перевода: в тестах WordPress не загружается.
+ */
+if (!function_exists('__')) {
+    function __($text, $domain = null)
+    {
+        return $text;
+    }
+}
+
+if (!function_exists('esc_html__')) {
+    function esc_html__($text, $domain = null)
+    {
+        return $text;
+    }
+}
+
 require dirname(__DIR__) . '/includes/auth/interface-wp-smsn1-ru-auth-provider-widget.php';
 require dirname(__DIR__) . '/includes/auth/class-wp-smsn1-ru-provider-telegram.php';
 
