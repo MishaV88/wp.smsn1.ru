@@ -1,13 +1,22 @@
 /**
  * WP.SMSn1.RU — формы входа, регистрации и подтверждения номера.
  *
- * Зависит от jQuery и объекта wp_smsn1_ru_ajax (ajax_url + nonce).
+ * Зависит от jQuery и объекта wp_smsn1_ru_ajax (ajax_url, nonce, strings).
+ * Все тексты приходят из PHP через wp_localize_script и переводимы.
  */
 jQuery(document).ready(function ($) {
     'use strict';
 
     var countdown = 0;
     var countdownInterval = null;
+    var strings = (window.wp_smsn1_ru_ajax && wp_smsn1_ru_ajax.strings) || {};
+
+    /**
+     * Текст из словаря с запасным вариантом.
+     */
+    function str(key, fallback) {
+        return strings[key] || fallback;
+    }
 
     /**
      * Единый вывод уведомлений: info | success | warning | error.
@@ -40,9 +49,14 @@ jQuery(document).ready(function ($) {
         return digits.length === 10 ? '+7' + digits : 'not_russian_num';
     }
 
+    function sendCodeLabel(seconds) {
+        return str('sendCodeTimer', 'Отправить код (%d сек)').replace('%d', seconds);
+    }
+
     function updateButtonText(seconds) {
-        $('#send-sms-code').text('Отправить код (' + seconds + ' сек)');
-        $('#send-sms-code-checkout').text('Отправить код (' + seconds + ' сек)');
+        var label = sendCodeLabel(seconds);
+        $('#send-sms-code').text(label);
+        $('#send-sms-code-checkout').text(label);
     }
 
     function startCountdown() {
@@ -58,7 +72,7 @@ jQuery(document).ready(function ($) {
                 $('#send-sms-code, #send-sms-code-checkout')
                     .prop('disabled', false)
                     .removeClass('is-busy')
-                    .text('Отправить код');
+                    .text(str('sendCode', 'Отправить код'));
             }
         }, 1000);
     }
@@ -89,7 +103,7 @@ jQuery(document).ready(function ($) {
     function handleAjaxError(xhr) {
         var message = (xhr && xhr.responseJSON && xhr.responseJSON.data)
             ? xhr.responseJSON.data
-            : 'Ошибка при отправке запроса. Попробуйте ещё раз.';
+            : str('requestError', 'Ошибка при отправке запроса. Попробуйте ещё раз.');
 
         showNotice(message, 'error');
     }
@@ -130,12 +144,12 @@ jQuery(document).ready(function ($) {
         var passwordConfirm = $('#user_password_confirm').val() || '';
 
         if (passwordConfirm !== '' && password !== passwordConfirm) {
-            showNotice('Пароли не совпадают.', 'error');
+            showNotice(str('passwordMismatch', 'Пароли не совпадают.'), 'error');
             return;
         }
 
         if (!$('.wp-smsn1-ru-field--code').is(':visible')) {
-            showNotice('Сначала получите код из СМС.', 'warning');
+            showNotice(str('getCodeFirst', 'Сначала получите код из СМС.'), 'warning');
             return;
         }
 
@@ -213,19 +227,21 @@ jQuery(document).ready(function ($) {
             success: function (response) {
                 if (response.success && response.data.exists) {
                     showNotice(
-                        'Пользователь с таким номером телефона уже существует. ' +
-                        '<a href="' + response.data.res_url + '">Войдите в систему</a>.',
+                        str('userExists', 'Пользователь с таким номером телефона уже существует.') +
+                        ' <a href="' + response.data.res_url + '">' +
+                        str('loginLink', 'Войдите в систему') +
+                        '</a>.',
                         'warning'
                     );
                     $('#createaccount').prop('checked', false);
                 } else if (!response.success) {
-                    showNotice('Не удалось проверить номер телефона.', 'error');
+                    showNotice(str('checkPhoneError', 'Не удалось проверить номер телефона.'), 'error');
                 }
             },
             error: function (xhr) {
                 var message = (xhr && xhr.responseJSON && xhr.responseJSON.data)
                     ? xhr.responseJSON.data
-                    : 'Не удалось проверить номер телефона.';
+                    : str('checkPhoneError', 'Не удалось проверить номер телефона.');
 
                 showNotice(message, 'error');
             }

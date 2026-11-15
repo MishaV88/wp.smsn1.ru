@@ -5,33 +5,33 @@
  */
 ?>
 <div class="wp-smsn1-ru-form">
-    <h2 class="wp-smsn1-ru-form__title">Вход на сайт</h2>
+    <h2 class="wp-smsn1-ru-form__title"><?php esc_html_e('Вход на сайт', 'wp-smsn1-ru'); ?></h2>
 
     <form id="wp-smsn1-ru-login-form" class="wp-smsn1-ru-form__body">
         <div class="wp-smsn1-ru-field">
-            <label for="phone_number">Номер телефона</label>
-            <input type="tel" id="phone_number" name="phone_number" placeholder="+7 999 123-45-67" autocomplete="tel" inputmode="tel" required>
+            <label for="phone_number"><?php esc_html_e('Номер телефона', 'wp-smsn1-ru'); ?></label>
+            <input type="tel" id="phone_number" name="phone_number" placeholder="<?php esc_attr_e('+7 999 123-45-67', 'wp-smsn1-ru'); ?>" autocomplete="tel" inputmode="tel" required>
         </div>
 
         <?php if (wp_smsn1_ru_auth_mode() === 'password_otp') : ?>
         <div class="wp-smsn1-ru-field">
-            <label for="user_password">Пароль</label>
-            <input type="password" id="user_password" name="user_password" autocomplete="current-password" placeholder="Если пароля ещё нет — придумайте его">
+            <label for="user_password"><?php esc_html_e('Пароль', 'wp-smsn1-ru'); ?></label>
+            <input type="password" id="user_password" name="user_password" autocomplete="current-password" placeholder="<?php esc_attr_e('Если пароля ещё нет — придумайте его', 'wp-smsn1-ru'); ?>">
         </div>
         <?php endif; ?>
 
         <div class="wp-smsn1-ru-field wp-smsn1-ru-field--code">
-            <label for="sms_code">Код из СМС</label>
-            <input type="text" id="sms_code" name="sms_code" inputmode="numeric" autocomplete="one-time-code" maxlength="5" placeholder="5 цифр">
+            <label for="sms_code"><?php esc_html_e('Код из СМС', 'wp-smsn1-ru'); ?></label>
+            <input type="text" id="sms_code" name="sms_code" inputmode="numeric" autocomplete="one-time-code" maxlength="5" placeholder="<?php esc_attr_e('5 цифр', 'wp-smsn1-ru'); ?>">
         </div>
 
         <div class="wp-smsn1-ru-actions">
-            <button type="button" id="send-sms-code" class="wp-smsn1-ru-button wp-smsn1-ru-button--secondary">Отправить код</button>
-            <button type="submit" class="wp-smsn1-ru-button wp-smsn1-ru-button--primary">Войти</button>
+            <button type="button" id="send-sms-code" class="wp-smsn1-ru-button wp-smsn1-ru-button--secondary"><?php esc_html_e('Отправить код', 'wp-smsn1-ru'); ?></button>
+            <button type="submit" class="wp-smsn1-ru-button wp-smsn1-ru-button--primary"><?php esc_html_e('Войти', 'wp-smsn1-ru'); ?></button>
         </div>
 
         <p class="wp-smsn1-ru-links">
-            <a href="<?php echo esc_url(wp_smsn1_ru_page_url('wp_smsn1_ru_use_custom_register_form_url', 'registation-by-wp-smsn1-ru')); ?>">Зарегистрироваться</a>
+            <a href="<?php echo esc_url(wp_smsn1_ru_page_url('wp_smsn1_ru_use_custom_register_form_url', 'registation-by-wp-smsn1-ru')); ?>"><?php esc_html_e('Зарегистрироваться', 'wp-smsn1-ru'); ?></a>
         </p>
 
         <input type="hidden" id="type_of_form" name="type_of_form" value="login">
@@ -44,13 +44,13 @@
     <?php if ($oauth_buttons !== '') : ?>
     <div class="wp-smsn1-ru-divider" aria-hidden="true">
         <span class="wp-smsn1-ru-divider__line"></span>
-        <span class="wp-smsn1-ru-divider__text">или</span>
+        <span class="wp-smsn1-ru-divider__text"><?php esc_html_e('или', 'wp-smsn1-ru'); ?></span>
         <span class="wp-smsn1-ru-divider__line"></span>
     </div>
     <?php echo $oauth_buttons; ?>
     <?php endif; ?>
 
     <p class="wp-smsn1-ru-privacy">
-        <a href="<?php echo esc_url(home_url('/privacy-policy/')); ?>" target="_blank" rel="noopener">Продолжая, вы соглашаетесь с политикой обработки персональных данных.</a>
+        <a href="<?php echo esc_url(home_url('/privacy-policy/')); ?>" target="_blank" rel="noopener"><?php esc_html_e('Продолжая, вы соглашаетесь с политикой обработки персональных данных.', 'wp-smsn1-ru'); ?></a>
     </p>
 </div>

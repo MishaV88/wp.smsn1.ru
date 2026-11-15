@@ -43,18 +43,23 @@
 
 ### 1. i18n (главный блокер)
 
-Сейчас 13 вызовов `__()` и почти все строки — жёстко по-русски в PHP и шаблонах.
+Часть работы уже сделана: строки обёрнуты в `__()`/`esc_html__()` с доменом `wp-smsn1-ru`,
+собран `languages/wp-smsn1-ru.pot` (70 строк).
 
-Нужно:
+- [x] шаблоны форм (`templates/*.php`);
+- [x] тексты JS — вынесены в `wp_localize_script` (`wp_smsn1_ru_ajax.strings`);
+- [x] сообщения AJAX-обработчиков в `wp-smsn1-ru.php`;
+- [x] тексты кодов и лимитов в `includes/wp-smsn1-ru-otp.php`;
+- [x] интерфейс привязки VK/Telegram и уведомления в `includes/wp-smsn1-ru-oauth.php`;
+- [x] `languages/wp-smsn1-ru.pot`.
+- [ ] настройки в админке (`includes/wp-smsn1-ru-admin.php`) — около 120 строк, самый
+      большой оставшийся кусок;
+- [ ] строки `wp_die()` в oauth-модуле (сообщения об ошибках входа);
+- [ ] решить судьбу языка исходника: оставить русский (сейчас так, UI не меняется)
+      или перевести на английский и добавить `wp-smsn1-ru-ru_RU.po/.mo`.
 
-- [ ] перевести исходные строки на английский и обернуть в `__()`/`esc_html__()`
-      с доменом `wp-smsn1-ru` (около 250 строк в `wp-smsn1-ru.php`, `includes/*`, `templates/*`);
-- [ ] строки JS — через `wp_localize_script` (сейчас часть текстов прямо в `script.js`);
-- [ ] сгенерировать `languages/wp-smsn1-ru.pot`;
-- [ ] сделать русский перевод `wp-smsn1-ru-ru_RU.po` + `.mo`.
-
-Инструменты: `wp i18n make-pot`, Poedit или `xgettext`. Без WP-CLI —
-`php -r` с обходом файлов тоже подойдёт.
+Пересобрать POT: `wp i18n make-pot . languages/wp-smsn1-ru.pot --domain=wp-smsn1-ru`
+или Poedit.
 
 ### 2. Скриншоты
 

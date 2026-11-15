@@ -157,7 +157,17 @@ function wp_smsn1_ru_scripts() {
     // Локализация скрипта для AJAX
     wp_localize_script('wp-smsn1-ru-script', 'wp_smsn1_ru_ajax', array(
         'ajax_url' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('wp_smsn1_ru_nonce')
+        'nonce'    => wp_create_nonce('wp_smsn1_ru_nonce'),
+        'strings'  => array(
+            'requestError'    => __('Ошибка при отправке запроса. Попробуйте ещё раз.', 'wp-smsn1-ru'),
+            'passwordMismatch' => __('Пароли не совпадают.', 'wp-smsn1-ru'),
+            'getCodeFirst'    => __('Сначала получите код из СМС.', 'wp-smsn1-ru'),
+            'userExists'      => __('Пользователь с таким номером телефона уже существует.', 'wp-smsn1-ru'),
+            'loginLink'       => __('Войдите в систему', 'wp-smsn1-ru'),
+            'checkPhoneError' => __('Не удалось проверить номер телефона.', 'wp-smsn1-ru'),
+            'sendCode'        => __('Отправить код', 'wp-smsn1-ru'),
+            'sendCodeTimer'   => __('Отправить код (%d сек)', 'wp-smsn1-ru'),
+        ),
     ));
 }
 // Шорткод для формы авторизации
@@ -258,14 +268,18 @@ function handle_send_sms_code() {
     $phone_number = isset($_POST['phone_number']) ? sanitize_my_phone_for_field(wp_unslash($_POST['phone_number'])) : 'not_russian_num';
 
     if ($phone_number === 'not_russian_num') {
-        wp_send_json_error('Проверьте номер телефона, на текущий момент доставка СМС осуществляется только на номера Российской Федерации');
+        wp_send_json_error(__('Проверьте номер телефона: доставка СМС работает только на номера Российской Федерации.', 'wp-smsn1-ru'));
     }
 
     $type_of_form = isset($_POST['type_of_form']) ? sanitize_text_field(wp_unslash($_POST['type_of_form'])) : '';
 
     if ($type_of_form === 'login' && !wp_smsn1_ru_get_user_by_phone($phone_number)) {
         $register_url = home_url('/') . get_option('wp_smsn1_ru_use_custom_register_form_url', 'registation-by-wp-smsn1-ru');
-        wp_send_json_error('Номер не найден. <a href="' . esc_url($register_url) . '">Зарегистрируйтесь</a> — это займёт около 30 секунд.');
+        wp_send_json_error(sprintf(
+				/* translators: %s: ссылка на страницу регистрации */
+				__('Номер не найден. <a href="%s">Зарегистрируйтесь</a> — это займёт около 30 секунд.', 'wp-smsn1-ru'),
+				esc_url($register_url)
+			));
     }
 
     // Защита от SMS-бомбинга: пауза между отправками и часовые лимиты на номер и IP
@@ -283,13 +297,13 @@ function handle_send_sms_code() {
 
     if ($sms_sent !== true) {
         $message = is_numeric($sms_sent) ? '#' . $sms_sent : $sms_sent;
-        wp_send_json_error('Ошибка при отправке СМС: ' . $message);
+        wp_send_json_error(sprintf(__('Ошибка при отправке СМС: %s', 'wp-smsn1-ru'), esc_html($message)));
     }
 
     wp_smsn1_ru_otp_store($phone_number, $sms_code);
     wp_smsn1_ru_otp_mark_sent($phone_number);
 
-    wp_send_json_success('Код отправлен на ваш номер: ' . $phone_number);
+    wp_send_json_success(sprintf(__('Код отправлен на ваш номер: %s', 'wp-smsn1-ru'), esc_html($phone_number)));
 }
 
 // Обработка проверки кода
@@ -299,7 +313,7 @@ function handle_verify_sms_code() {
     $phone_number = isset($_POST['phone_number']) ? sanitize_my_phone_for_field(wp_unslash($_POST['phone_number'])) : 'not_russian_num';
 
     if ($phone_number === 'not_russian_num') {
-        wp_send_json_error('Проверьте номер телефона, на текущий момент доставка СМС осуществляется только на номера Российской Федерации');
+        wp_send_json_error(__('Проверьте номер телефона: доставка СМС работает только на номера Российской Федерации.', 'wp-smsn1-ru'));
     }
 
     $user_code  = isset($_POST['sms_code']) ? sanitize_text_field(wp_unslash($_POST['sms_code'])) : '';
@@ -317,11 +331,11 @@ function handle_verify_sms_code() {
         $email_required = get_option('wp_smsn1_ru_email_not_need_mode') !== 'yes';
 
         if ($email_required && !is_email($email)) {
-            wp_send_json_error('Укажите корректный e-mail: он потребуется для восстановления доступа.');
+            wp_send_json_error(__('Укажите корректный e-mail: он потребуется для восстановления доступа.', 'wp-smsn1-ru'));
         }
 
         if ($email !== '' && email_exists($email)) {
-            wp_send_json_error('Этот e-mail уже зарегистрирован.');
+            wp_send_json_error(__('Этот e-mail уже зарегистрирован.', 'wp-smsn1-ru'));
         }
     }
 
@@ -329,11 +343,11 @@ function handle_verify_sms_code() {
         $has_password = $user && get_user_meta($user->ID, 'wp_smsn1_ru_password_set', true);
 
         if ($password === '') {
-            wp_send_json_error('Введите пароль. Если вы ещё не задавали пароль, придумайте новый — он сохранится после подтверждения кода.');
+            wp_send_json_error(__('Введите пароль. Если вы ещё не задавали пароль, придумайте новый — он сохранится после подтверждения кода.', 'wp-smsn1-ru'));
         }
 
         if ($password2 !== '' && $password !== $password2) {
-            wp_send_json_error('Пароли не совпадают.');
+            wp_send_json_error(__('Пароли не совпадают.', 'wp-smsn1-ru'));
         }
 
         if ($has_password) {
@@ -342,12 +356,12 @@ function handle_verify_sms_code() {
             $fails    = (int) get_transient($fail_key);
 
             if ($fails >= 5) {
-                wp_send_json_error('Слишком много неверных попыток ввода пароля. Попробуйте через 15 минут.');
+                wp_send_json_error(__('Слишком много неверных попыток ввода пароля. Попробуйте через 15 минут.', 'wp-smsn1-ru'));
             }
 
             if (!wp_check_password($password, $user->user_pass, $user->ID)) {
                 set_transient($fail_key, $fails + 1, 15 * MINUTE_IN_SECONDS);
-                wp_send_json_error('Неверный пароль.');
+                wp_send_json_error(__('Неверный пароль.', 'wp-smsn1-ru'));
             }
 
             delete_transient($fail_key);
@@ -373,11 +387,11 @@ function handle_verify_sms_code() {
         $user_id = wp_smsn1_ru_create_user($phone_number, $email, $two_factor ? $password : null);
 
         if (is_wp_error($user_id)) {
-            wp_send_json_error('Ошибка при создании пользователя: ' . $user_id->get_error_message());
+            wp_send_json_error(sprintf(__('Ошибка при создании пользователя: %s', 'wp-smsn1-ru'), esc_html($user_id->get_error_message())));
         }
 
         if (!$user_id) {
-            wp_send_json_error('Ошибка при создании пользователя.');
+            wp_send_json_error(__('Ошибка при создании пользователя.', 'wp-smsn1-ru'));
         }
 
         $message = 'Успешная регистрация, Вы авторизованы.';
@@ -390,7 +404,7 @@ function handle_verify_sms_code() {
     $user = get_user_by('id', $user_id);
 
     if (!$user) {
-        wp_send_json_error('Не удалось загрузить учётную запись.');
+        wp_send_json_error(__('Не удалось загрузить учётную запись.', 'wp-smsn1-ru'));
     }
 
     wp_set_current_user($user_id);

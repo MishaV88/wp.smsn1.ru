@@ -97,7 +97,7 @@ function wp_smsn1_ru_otp_check($phone, $code, $consume = true)
     $record = wp_smsn1_ru_otp_get($phone);
 
     if ($record === false) {
-        return 'Код не найден или истёк. Запросите новый код.';
+        return __('Код не найден или истёк. Запросите новый код.', 'wp-smsn1-ru');
     }
 
     $code = (string) $code;
@@ -117,14 +117,14 @@ function wp_smsn1_ru_otp_check($phone, $code, $consume = true)
 
     if ($attempts >= $max) {
         wp_smsn1_ru_otp_clear($phone);
-        return 'Слишком много неверных попыток. Запросите новый код.';
+        return __('Слишком много неверных попыток. Запросите новый код.', 'wp-smsn1-ru');
     }
 
     $ttl                  = max(1, $record['expires'] - time());
     $record['attempts']   = $attempts;
     set_transient(wp_smsn1_ru_otp_phone_key($phone), $record, $ttl);
 
-    return 'Неверный код. Осталось попыток: ' . ($max - $attempts);
+    return sprintf(__('Неверный код. Осталось попыток: %d', 'wp-smsn1-ru'), $max - $attempts);
 }
 
 /* -------------------------------------------------------------------------
@@ -192,10 +192,10 @@ function wp_smsn1_ru_otp_window_left_text()
     $left   = $window - (time() % $window);
 
     if ($left < 120) {
-        return $left . ' сек.';
+        return sprintf(__('%d сек.', 'wp-smsn1-ru'), $left);
     }
 
-    return (int) ceil($left / 60) . ' мин.';
+    return sprintf(__('%d мин.', 'wp-smsn1-ru'), (int) ceil($left / 60));
 }
 
 /**
@@ -211,17 +211,17 @@ function wp_smsn1_ru_otp_can_send($phone, $ip = null)
 
     $cooldown_until = (int) get_transient(wp_smsn1_ru_otp_cooldown_key($phone));
     if ($cooldown_until > time()) {
-        return 'Код уже отправлен. Повторить можно через ' . ($cooldown_until - time()) . ' сек.';
+        return sprintf(__('Код уже отправлен. Повторить можно через %d сек.', 'wp-smsn1-ru'), $cooldown_until - time());
     }
 
     $phone_count = (int) get_transient(wp_smsn1_ru_otp_phone_window_key($phone));
     if ($phone_count >= wp_smsn1_ru_otp_phone_limit()) {
-        return 'Слишком много запросов кода на этот номер. Повторите через ' . wp_smsn1_ru_otp_window_left_text();
+        return sprintf(__('Слишком много запросов кода на этот номер. Повторите через %s.', 'wp-smsn1-ru'), wp_smsn1_ru_otp_window_left_text());
     }
 
     $ip_count = (int) get_transient(wp_smsn1_ru_otp_ip_window_key($ip));
     if ($ip_count >= wp_smsn1_ru_otp_ip_limit()) {
-        return 'Слишком много запросов. Повторите через ' . wp_smsn1_ru_otp_window_left_text();
+        return sprintf(__('Слишком много запросов. Повторите через %s.', 'wp-smsn1-ru'), wp_smsn1_ru_otp_window_left_text());
     }
 
     return true;
@@ -265,7 +265,7 @@ function wp_smsn1_ru_otp_mark_sent($phone, $ip = null)
 function wp_smsn1_ru_password_problem($password)
 {
     if (strlen((string) $password) < 8) {
-        return 'Пароль должен быть не короче 8 символов.';
+        return __('Пароль должен быть не короче 8 символов.', 'wp-smsn1-ru');
     }
 
     return false;

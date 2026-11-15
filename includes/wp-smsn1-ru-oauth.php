@@ -406,10 +406,10 @@ function wp_smsn1_ru_oauth_buttons_html()
         $url = add_query_arg('wp_smsn1_ru_oauth', $id, home_url('/'));
 
         $buttons[] = sprintf(
-            '<a class="wp-smsn1-ru-oauth-button wp-smsn1-ru-oauth-%1$s" href="%2$s" rel="nofollow">Войти через %3$s</a>',
+            '<a class="wp-smsn1-ru-oauth-button wp-smsn1-ru-oauth-%1$s" href="%2$s" rel="nofollow">%3$s</a>',
             esc_attr($id),
             esc_url($url),
-            esc_html($provider->get_label())
+            esc_html(sprintf(__('Войти через %s', 'wp-smsn1-ru'), $provider->get_label()))
         );
     }
 
@@ -418,7 +418,7 @@ function wp_smsn1_ru_oauth_buttons_html()
     }
 
     return '<div class="wp-smsn1-ru-oauth-block">'
-        . '<p class="wp-smsn1-ru-oauth-title">Войти другим способом</p>'
+        . '<p class="wp-smsn1-ru-oauth-title">' . esc_html__('Войти другим способом', 'wp-smsn1-ru') . '</p>'
         . implode('', $buttons)
         . '</div>';
 }
@@ -448,8 +448,8 @@ function wp_smsn1_ru_oauth_login_url()
 function wp_smsn1_ru_oauth_notice_text($code)
 {
     $messages = array(
-        'email_exists' => 'Аккаунт с таким e-mail уже существует. Войдите в него, а затем привяжите VK ID в профиле — мы не объединяем аккаунты автоматически.',
-        'phone_exists' => 'Аккаунт с таким номером телефона уже существует. Войдите в него, а затем привяжите VK ID в профиле.',
+        'email_exists' => __('Аккаунт с таким e-mail уже существует. Войдите в него, а затем привяжите VK ID в профиле — мы не объединяем аккаунты автоматически.', 'wp-smsn1-ru'),
+        'phone_exists' => __('Аккаунт с таким номером телефона уже существует. Войдите в него, а затем привяжите VK ID в профиле.', 'wp-smsn1-ru'),
     );
 
     return isset($messages[$code]) ? $messages[$code] : '';
@@ -532,8 +532,9 @@ function wp_smsn1_ru_oauth_profile_section_html($user_id, $redirect_to = '')
             if ($linked) {
                 $rows[] = sprintf(
                     '<li class="wp-smsn1-ru-linked__item"><span class="wp-smsn1-ru-linked__name">%1$s</span>'
-                    . '<span class="wp-smsn1-ru-linked__state wp-smsn1-ru-linked__state--ok">привязан</span></li>',
-                    esc_html($provider->get_label())
+                    . '<span class="wp-smsn1-ru-linked__state wp-smsn1-ru-linked__state--ok">%2$s</span></li>',
+                    esc_html($provider->get_label()),
+                    esc_html__('привязан', 'wp-smsn1-ru')
                 );
             } else {
                 $token = wp_smsn1_ru_oauth_create_link_token($user_id, $id, $redirect_to);
@@ -562,19 +563,22 @@ function wp_smsn1_ru_oauth_profile_section_html($user_id, $redirect_to = '')
         if ($linked) {
             $rows[] = sprintf(
                 '<li class="wp-smsn1-ru-linked__item"><span class="wp-smsn1-ru-linked__name">%1$s</span>'
-                . '<span class="wp-smsn1-ru-linked__state wp-smsn1-ru-linked__state--ok">привязан</span>'
-                . '<a class="wp-smsn1-ru-linked__refresh" href="%2$s">обновить данные</a></li>',
+                . '<span class="wp-smsn1-ru-linked__state wp-smsn1-ru-linked__state--ok">%2$s</span>'
+                . '<a class="wp-smsn1-ru-linked__refresh" href="%3$s">%4$s</a></li>',
                 esc_html($provider->get_label()),
-                esc_url($url)
+                esc_html__('привязан', 'wp-smsn1-ru'),
+                esc_url($url),
+                esc_html__('обновить данные', 'wp-smsn1-ru')
             );
             continue;
         }
 
         $rows[] = sprintf(
             '<li class="wp-smsn1-ru-linked__item"><span class="wp-smsn1-ru-linked__name">%1$s</span>'
-            . '<a class="wp-smsn1-ru-button wp-smsn1-ru-button--secondary" href="%2$s">Привязать</a></li>',
+            . '<a class="wp-smsn1-ru-button wp-smsn1-ru-button--secondary" href="%2$s">%3$s</a></li>',
             esc_html($provider->get_label()),
-            esc_url($url)
+            esc_url($url),
+            esc_html__('Привязать', 'wp-smsn1-ru')
         );
     }
 
@@ -586,13 +590,13 @@ function wp_smsn1_ru_oauth_profile_section_html($user_id, $redirect_to = '')
 
     if (!empty($_GET['wp_smsn1_ru_linked'])) {
         $notice = '<div class="wp-smsn1-ru-notice wp-smsn1-ru-notice--success" role="status">'
-            . 'Сервис привязан к аккаунту — теперь можно входить через него.'
+            . esc_html__('Сервис привязан к аккаунту — теперь можно входить через него.', 'wp-smsn1-ru')
             . '</div>';
     }
 
     return $notice . '<div class="wp-smsn1-ru-linked">'
-        . '<h2 class="wp-smsn1-ru-linked__title">Способы входа</h2>'
-        . '<p class="wp-smsn1-ru-linked__intro">Привяжите сервис — и сможете входить в этот аккаунт без СМС.</p>'
+        . '<h2 class="wp-smsn1-ru-linked__title">' . esc_html__('Способы входа', 'wp-smsn1-ru') . '</h2>'
+        . '<p class="wp-smsn1-ru-linked__intro">' . esc_html__('Привяжите сервис — и сможете входить в этот аккаунт без СМС.', 'wp-smsn1-ru') . '</p>'
         . '<ul class="wp-smsn1-ru-linked__list">' . implode('', $rows) . '</ul>'
         . '</div>';
 }
@@ -711,7 +715,7 @@ add_action('admin_notices', 'wp_smsn1_ru_oauth_linked_notice');
 function wp_smsn1_ru_oauth_linked_notice()
 {
     if (!empty($_GET['wp_smsn1_ru_linked'])) {
-        echo '<div class="notice notice-success is-dismissible"><p>Сервис привязан к аккаунту.</p></div>';
+        echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Сервис привязан к аккаунту.', 'wp-smsn1-ru') . '</p></div>';
     }
 }
 
