@@ -265,7 +265,7 @@ GitHub Actions проверит синтаксис на PHP 7.4–8.3, прог�
 - [ ] Вход через MAX (отложено)
 - [ ] Telegram deep-link (не помогает в РФ: домены Telegram блокируются)
 
-План развития провайдеров — [docs/auth-providers.md](docs/auth-providers.md),
+Подготовка к WordPress.org — [docs/wordpress-org.md](docs/wordpress-org.md), план развития провайдеров — [docs/auth-providers.md](docs/auth-providers.md),
 подробная логика входов — [docs/login-flow.md](docs/login-flow.md).
 
 ---

@@ -7,7 +7,7 @@ $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
 
 $slug  = 'wp-smsn1-ru'
-$files = @('wp-smsn1-ru.php', 'includes', 'templates', 'assets', 'readme.txt', 'LICENSE')
+$files = @('wp-smsn1-ru.php', 'includes', 'templates', 'assets', 'languages', 'readme.txt', 'uninstall.php', 'LICENSE')
 
 $dist = Join-Path $root 'dist'
 if (Test-Path $dist) { Remove-Item $dist -Recurse -Force }
@@ -17,6 +17,8 @@ New-Item -ItemType Directory -Path $stage -Force | Out-Null
 foreach ($f in $files) {
     Copy-Item -Path (Join-Path $root $f) -Destination $stage -Recurse -Force
 }
+
+Remove-Item (Join-Path $stage "languages/.gitkeep") -Force -ErrorAction SilentlyContinue
 
 $zip = Join-Path $dist "$slug.zip"
 # Важно: архивируем саму папку, иначе WordPress распакует файлы в корень plugins/
