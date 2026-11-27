@@ -4,7 +4,7 @@ Tags: sms, otp, login, two-factor, woocommerce
 Requires at least: 5.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.9.0
+Stable tag: 1.9.1
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -100,6 +100,10 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 3. Блок «Способы входа» в личном кабинете с привязкой VK ID.
 
 == Changelog ==
+
+= 1.9.1 =
+* Гость с номером, привязанным к аккаунту, может оформить заказ: подтверждение кода больше не блокирует покупку.
+* Исправлена сборка архива в Windows: записи ZIP используют прямые слэши, иначе на Linux-хостинге файлы распаковывались с «\» в имени.
 
 = 1.9.0 =
 * Подтверждение номера телефона на оформлении заказа работает «из коробки»: включено по умолчанию при активном WooCommerce.

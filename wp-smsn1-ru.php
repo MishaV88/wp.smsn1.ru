@@ -4,7 +4,7 @@
  * Description: Вход и регистрация по коду из СМС, режим 2FA, вход через VK ID и Telegram, подтверждение номера на checkout WooCommerce. Для номеров РФ; отправка СМС через сервис smsn1.ru.
  * Plugin URI:  https://wp.smsn1.ru/
  * Author URI:  https://docs-group.ru/
- * Version: 1.9.0
+ * Version: 1.9.1
  * Requires at least: 5.6
  * Requires PHP: 7.4
  * Author: Vasilev Mikhail Y.
@@ -28,7 +28,7 @@ function wp_smsn1_ru_load_textdomain()
 add_action('init', 'wp_smsn1_ru_load_textdomain');
 
 if (!defined('WP_SMSN1_RU_VERSION')) {
-    define('WP_SMSN1_RU_VERSION', '1.9.0');
+    define('WP_SMSN1_RU_VERSION', '1.9.1');
 }
 
 // Подключение необходимых файлов

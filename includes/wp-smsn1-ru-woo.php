@@ -123,24 +123,12 @@ function wp_smsn1_ru_validate_checkout_sms_code()
 
     // consume = false: код остаётся действительным, если заказ не удалось оформить
     // с первой попытки (ошибка оплаты, повторная валидация).
+    // Наличие аккаунта с этим номером заказ не блокирует: гость вправе оформить заказ без входа.
     $checked = wp_smsn1_ru_otp_check($phone, $code, false);
 
     if ($checked !== true) {
         wc_add_notice($checked, 'error');
         return;
-    }
-
-    if (wp_smsn1_ru_get_user_by_phone($phone)) {
-        $login_url = wp_smsn1_ru_page_url('wp_smsn1_ru_use_custom_login_form_url', 'login-by-wp-smsn1-ru');
-
-        wc_add_notice(
-            sprintf(
-                /* translators: %s: ссылка на страницу входа */
-                __('Этот номер уже привязан к аккаунту. <a href="%s">Войдите в систему</a> — так вы сможете видеть историю заказов.', 'wp-smsn1-ru'),
-                esc_url($login_url)
-            ),
-            'error'
-        );
     }
 }
 add_action('woocommerce_checkout_process', 'wp_smsn1_ru_validate_checkout_sms_code');
