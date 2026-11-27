@@ -378,3 +378,9 @@
     font-size: 0.85rem;
     text-decoration: underline;
 }
+
+/* Кнопка отправки кода на оформлении заказа */
+
+.wp-smsn1-ru-checkout-send {
+    margin-top: 0.5rem;
+}
