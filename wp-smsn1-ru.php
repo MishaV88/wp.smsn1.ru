@@ -4,7 +4,7 @@
  * Description: Вход и регистрация по коду из СМС, режим 2FA, вход через VK ID и Telegram, подтверждение номера на checkout WooCommerce. Для номеров РФ; отправка СМС через сервис smsn1.ru.
  * Plugin URI:  https://wp.smsn1.ru/
  * Author URI:  https://docs-group.ru/
- * Version: 1.8.0
+ * Version: 1.9.0
  * Requires at least: 5.6
  * Requires PHP: 7.4
  * Author: Vasilev Mikhail Y.
@@ -28,7 +28,7 @@ function wp_smsn1_ru_load_textdomain()
 add_action('init', 'wp_smsn1_ru_load_textdomain');
 
 if (!defined('WP_SMSN1_RU_VERSION')) {
-    define('WP_SMSN1_RU_VERSION', '1.8.0');
+    define('WP_SMSN1_RU_VERSION', '1.9.0');
 }
 
 // Подключение необходимых файлов
@@ -43,7 +43,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-oauth.php';
 require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-privacy.php';
 require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-admin.php'; //Этот файл будет содержать код для добавления настроек плагина в административной панели.
 // Проверка работоспособности плагина и активирован ли WooCommerce
-if (  wp_smsn1_ru_get_balance() >= 10 && wp_smsn1_ru_get_balance() != "Проблема с соединением" && in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', get_option( 'active_plugins' ) ) )) {
+if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
 	require_once plugin_dir_path(__FILE__) . 'includes/wp-smsn1-ru-woo.php'; //Функции необходимые для работы с smsn1.ru
 }
 //Проверяем и при необходимости создаем необходимые страницы и настройки плагина во время активации
@@ -167,6 +167,7 @@ function wp_smsn1_ru_scripts() {
             'checkPhoneError' => __('Не удалось проверить номер телефона.', 'wp-smsn1-ru'),
             'sendCode'        => __('Отправить код', 'wp-smsn1-ru'),
             'sendCodeTimer'   => __('Отправить код (%d сек)', 'wp-smsn1-ru'),
+            'invalidPhone'    => __('Укажите номер в формате +7XXXXXXXXXX.', 'wp-smsn1-ru'),
         ),
     ));
 }

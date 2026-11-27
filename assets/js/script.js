@@ -178,15 +178,47 @@ jQuery(document).ready(function ($) {
         });
     });
 
+    // Кнопка приходит внутри описания поля (Woo помечает его aria-hidden) — выносим её наружу
+    var $checkoutButton = $('#billing_sms_code').closest('.form-row').find('#send-sms-code-checkout');
+    if ($checkoutButton.length && $checkoutButton.parent().is('.description')) {
+        var $row = $checkoutButton.closest('.form-row');
+        $checkoutButton.closest('.description').removeAttr('aria-hidden');
+        $row.find('#wp-smsn1-ru-message').appendTo($row);
+        $checkoutButton.appendTo($row);
+    }
+
+    // Если кнопки нет вовсе — добавляем сами
+    if ($('#billing_sms_code').length && !$('#send-sms-code-checkout').length) {
+        $('#billing_sms_code').closest('.form-row').append(
+            '<p class="wp-smsn1-ru-checkout-send"><button type="button" id="send-sms-code-checkout" class="button">' +
+            str('sendCode', 'Отправить код') +
+            '</button></p>'
+        );
+    }
+
     // Отправка кода на странице оформления заказа
-    $('#send-sms-code-checkout').on('click', function () {
+    $(document).on('click', '#send-sms-code-checkout', function () {
         if (countdown > 0) {
             return;
         }
 
-        var phoneNumber = normalizePhone($('#custom_phone').val());
-        $('#billing_phone').val(phoneNumber);
-        $('#shipping_phone').val(phoneNumber);
+        var $phone = $('#custom_phone').length ? $('#custom_phone') : $('#billing_phone');
+        var phoneNumber = normalizePhone($phone.val());
+
+        if (phoneNumber === 'not_russian_num') {
+            showNotice(str('invalidPhone', 'Укажите номер в формате +7XXXXXXXXXX.'), 'error');
+            return;
+        }
+
+        $phone.val(phoneNumber);
+
+        if ($('#billing_phone').length) {
+            $('#billing_phone').val(phoneNumber);
+        }
+
+        if ($('#shipping_phone').length) {
+            $('#shipping_phone').val(phoneNumber);
+        }
 
         $.ajax({
             url: wp_smsn1_ru_ajax.ajax_url,

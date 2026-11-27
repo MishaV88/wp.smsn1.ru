@@ -4,7 +4,7 @@ Tags: sms, otp, login, two-factor, woocommerce
 Requires at least: 5.6
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.8.0
+Stable tag: 1.9.0
 License: GPL-2.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -100,6 +100,13 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 3. Блок «Способы входа» в личном кабинете с привязкой VK ID.
 
 == Changelog ==
+
+= 1.9.0 =
+* Подтверждение номера телефона на оформлении заказа работает «из коробки»: включено по умолчанию при активном WooCommerce.
+* Поле «Код из СМС» добавлено через `woocommerce_checkout_fields` — теперь отображается в любой теме, независимо от её хуков (проверено на Woodmart).
+* Проверяется номер из поля «Телефон» (`billing_phone`), отдельное поле номера больше не нужно.
+* Телефон заказа сохраняется в едином формате +7XXXXXXXXXX.
+* Woo-модуль подключается всегда при активном WooCommerce, а не только при балансе 10 ₽ и выше.
 
 = 1.8.0 =
 * При недоступных СМС (баланс меньше 10 ₽ или сбой сервиса) показывается экран

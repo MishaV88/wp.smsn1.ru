@@ -148,7 +148,7 @@ function wp_smsn1_ru_register_settings() {
     add_settings_section('wp_smsn1_ru_operating_modes_section', 'Режим работы', null, 'wp-smsn1-ru-settings');
     add_settings_field('wp_smsn1_ru_email_not_need_mode', 'Разрешить быструю регистрацию', 'wp_smsn1_ru_email_not_need_mode', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_operating_modes_section');
     if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
-        add_settings_field('wp_smsn1_ru_verphone_on_checkout_mode', 'Включить верификацию номера телефона на странице оформления заказа', 'wp_smsn1_ru_verphone_on_checkout_mode', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_operating_modes_section');
+        add_settings_field('wp_smsn1_ru_verphone_on_checkout_mode', 'Подтверждение номера телефона на оформлении заказа', 'wp_smsn1_ru_verphone_on_checkout_mode', 'wp-smsn1-ru-settings', 'wp_smsn1_ru_operating_modes_section');
     }
 
     add_settings_section('wp_smsn1_ru_auth_section', 'Режим входа', 'wp_smsn1_ru_auth_section_callback', 'wp-smsn1-ru-settings');
@@ -215,11 +215,10 @@ function wp_smsn1_ru_email_not_need_mode() {
 	echo '<p class="description">Система позволяет пользователям авторизоваться без предварительной регистрации(не нужно вводить e-mail). При этом автоматически создаётся учётная запись с указанным номером. На самой форме регистрации необходимость вводить e-mail остается, но ее можно просто в этом случае не использовать.</p>';
 }
 function wp_smsn1_ru_verphone_on_checkout_mode() {
-    $checked = get_option('wp_smsn1_ru_verphone_on_checkout_mode');
-	if($checked == 'yes') $checked = 'checked';
-	else $checked = '';
+    $value = get_option('wp_smsn1_ru_verphone_on_checkout_mode', null);
+	$checked = ($value === null || $value === 'yes') ? 'checked' : '';
 	echo '<input type="checkbox" name="wp_smsn1_ru_verphone_on_checkout_mode" id="wp_smsn1_ru_verphone_on_checkout_mode" value="yes" '. $checked.' />';
-	echo '<p class="description">Взаимодействет с плагином WooCommerce. В случае если клиент интернет-магазина не прошёл авторизацию, при оформлении заказа ему потребуется подтвердить свой номер телефона. Если клиент с таким номером телефона уже зарегистрирован, заказ будет привязан к его аккаунту.</p>';
+	echo '<p class="description">Работает при активном WooCommerce и включено по умолчанию. Гость при оформлении заказа вводит код из СМС для своего номера — поле появляется в блоке оплаты. Если номер уже занят аккаунтом, покупателю предлагается войти.</p>';
 }
 // Функция для отображения поля ввода часов авторизации сессии пользователя
 function wp_smsn1_ru_session_expiration_hours_callback() {
